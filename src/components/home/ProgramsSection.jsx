@@ -1,23 +1,41 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+
+const projects = [
+  {
+    num: '01',
+    title: {
+      it: 'Orientamento Imprenditoria e Lavoro',
+      en: 'Entrepreneurship & Career Orientation',
+    },
+    desc: {
+      it: "Un percorso di orientamento rivolto a studenti delle scuole secondarie di secondo grado e dell'università, pensato per avvicinare i giovani al mondo dell'imprenditoria e del lavoro. Attraverso incontri, testimonianze e attività pratiche, il progetto aiuta i ragazzi a orientarsi tra le opportunità formative e professionali disponibili sul territorio e a sviluppare competenze imprenditoriali e trasversali utili per il proprio futuro.",
+      en: "An orientation programme for upper secondary school and university students, designed to introduce young people to entrepreneurship and the world of work. Through meetings, testimonials and hands-on activities, the project helps students navigate the educational and professional opportunities available in their region, while developing entrepreneurial and transferable skills for their future.",
+    },
+  },
+  {
+    num: '02',
+    title: {
+      it: 'Esperienza Nautica per Diversamente Abili',
+      en: 'Sailing Experience for People with Disabilities',
+    },
+    desc: {
+      it: "Un progetto di inclusione sociale che offre a persone con disabilità l'opportunità di vivere un'esperienza nautica, in un contesto sicuro e accogliente. L'iniziativa favorisce l'inclusione, l'autonomia e il benessere dei partecipanti, promuovendo al tempo stesso una cultura del mare e dello sport accessibile a tutti.",
+      en: "A social inclusion project that gives people with disabilities the opportunity to experience sailing in a safe and welcoming setting. The initiative fosters inclusion, independence and wellbeing among participants, while promoting a culture of the sea and sport that is accessible to everyone.",
+    },
+  },
+];
 
 const translations = {
   it: {
-    label: '03 / PROGRAMMI',
+    label: '03 / PROGETTI',
     title: 'I nostri ',
-    titleAccent: 'programmi.',
-    soon: 'Presto disponibile',
-    desc: 'Stiamo lavorando a nuovi programmi e iniziative per giovani tra i 15 e i 30 anni. Registrati per essere tra i primi a saperlo.',
-    cta: 'Tienimi aggiornato',
+    titleAccent: 'progetti.',
   },
   en: {
-    label: '03 / PROGRAMS',
+    label: '03 / PROJECTS',
     title: 'Our ',
-    titleAccent: 'programs.',
-    soon: 'Coming soon',
-    desc: 'We are working on new programs and initiatives for young people aged 15 to 30. Sign up to be among the first to know.',
-    cta: 'Keep me updated',
+    titleAccent: 'projects.',
   },
 };
 
@@ -35,20 +53,24 @@ export default function ProgramsSection({ lang }) {
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           {t.title}<span className="text-blue-gradient">{t.titleAccent}</span>
         </motion.h2>
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-          className="text-center py-20 px-10 rounded-2xl max-w-2xl mx-auto"
-          style={{ border: '2px dashed #e5e7eb' }}>
-          <p className="font-mono text-[10px] uppercase tracking-[0.4em] mb-6" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
-            {t.soon}
-          </p>
-          <h3 className="font-heading font-extrabold text-2xl mb-4" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t.soon}</h3>
-          <p className="text-lg leading-relaxed mb-8" style={{ color: '#6b7280' }}>{t.desc}</p>
-          <Link to="/contatti"
-            className="inline-block px-8 py-4 font-heading font-bold text-sm tracking-wide rounded-full text-white"
-            style={{ backgroundColor: '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            {t.cta}
-          </Link>
-        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {projects.map((project, i) => (
+            <motion.div key={project.num} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} transition={{ delay: i * 0.15 }}
+              className="p-10 lg:p-12 rounded-2xl" style={{ border: '1.5px solid #f3f4f6' }}>
+              <p className="font-mono text-[10px] uppercase tracking-[0.4em] mb-6" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
+                {project.num}
+              </p>
+              <h3 className="font-heading font-bold text-2xl mb-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                {project.title[lang]}
+              </h3>
+              <p className="leading-relaxed text-sm" style={{ color: '#6b7280' }}>
+                {project.desc[lang]}
+              </p>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   );
