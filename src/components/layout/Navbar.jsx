@@ -119,14 +119,14 @@ export default function Navbar({ lang, setLang }) {
             exit={{ opacity: 0, y: -20 }}
             className="fixed inset-0 z-40 bg-white pt-24 px-8"
           >
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-6">
               {navLinks.map((link, i) => (
                 <motion.div key={link.label} initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}>
                   <Link
                     to={link.to}
                     onClick={handleNavClick}
-                    className="font-heading text-4xl font-bold hover:text-primary transition-colors"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    className="font-heading text-2xl font-bold transition-opacity hover:opacity-70"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#1a4fc4' }}
                   >
                     {link.label}
                   </Link>

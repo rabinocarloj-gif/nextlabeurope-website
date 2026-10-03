@@ -14,8 +14,8 @@ const team = [
     name: 'Chiara Foschi',
     role: { it: 'Vicepresidente', en: 'Vice President' },
     bio: {
-      it: 'Laureata triennale in Economia Politica ed Etica presso Unibz, oggi studentessa magistrale in International Economic Policy a Sciences Po Parigi.',
-      en: "Bachelor's degree in Political Economy and Ethics from Unibz, currently a Master's student in International Economic Policy at Sciences Po Paris.",
+      it: 'Laureata triennale in Economia, Politica ed Etica presso Unibz, oggi studentessa magistrale in International Economic Policy a Sciences Po Parigi.',
+      en: "Bachelor's degree in Economics, Politics and Ethics from Unibz, currently a Master's student in International Economic Policy at Sciences Po Paris.",
     },
   },
   {

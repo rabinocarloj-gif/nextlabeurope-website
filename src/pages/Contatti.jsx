@@ -129,14 +129,6 @@ export default function Contatti() {
         <div className="absolute inset-0">
           <div aria-hidden="true" className="kenburns w-full h-full" style={{ backgroundImage: `url(${CONTACT_IMG})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(252,252,252,0.95), rgba(252,252,252,0.9), rgba(252,252,252,1))' }} />
-          <svg aria-hidden="true" viewBox="0 0 400 400" className="bloom-in absolute -top-24 -right-24 w-[520px] h-[520px] opacity-70" style={{ animationDelay: '0.2s' }}>
-            {Array.from({ length: 12 }, (_, i) => {
-              const a = (i / 12) * Math.PI * 2 - Math.PI / 2; const cx = 200 + Math.cos(a) * 150, cy = 200 + Math.sin(a) * 150;
-              const pts = Array.from({ length: 10 }, (_, j) => { const r = j % 2 === 0 ? 9 : 3.8; const b = (j / 10) * Math.PI * 2 - Math.PI / 2; return `${(cx + Math.cos(b) * r).toFixed(1)},${(cy + Math.sin(b) * r).toFixed(1)}`; }).join(' ');
-              return <polygon key={i} className="eu-star" points={pts} fill="#4a90e2" style={{ opacity: 0.35, animationDelay: `${i * 0.5}s` }} />;
-            })}
-            <circle cx="200" cy="200" r="150" fill="none" stroke="rgba(26,79,196,0.12)" strokeDasharray="2 6" />
-          </svg>
           <div aria-hidden="true" className="bloom-in absolute inset-0" style={{ background: 'radial-gradient(120% 80% at 85% 0%, rgba(74,144,226,0.14) 0%, rgba(74,144,226,0) 55%)' }} />
           <div aria-hidden="true" className="aurora absolute -top-32 right-[8%] w-[560px] h-[560px] rounded-full"
             style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.18) 0%, rgba(74,144,226,0) 70%)' }} />
@@ -277,17 +269,24 @@ export default function Contatti() {
               <div className="card-glow group relative p-8 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-1"
                 style={{ background: 'linear-gradient(145deg, #eff4ff 0%, #f8faff 60%, #ffffff 100%)', border: '1px solid rgba(26,79,196,0.14)', boxShadow: '0 20px 40px -28px rgba(26,79,196,0.45)' }}>
                 <svg aria-hidden="true" viewBox="0 0 200 140" className="absolute right-4 bottom-2 w-48 h-36 pointer-events-none" fill="none">
-                  <path d="M188 18 C 150 10, 108 26, 92 62 C 80 90, 60 108, 22 112" pathLength="1"
-                    className="[stroke-dashoffset:0.35] transition-[stroke-dashoffset] duration-[1400ms] ease-out group-hover:[stroke-dashoffset:0]"
-                    stroke="url(#joinArrow)" strokeWidth="2.2" strokeLinecap="round" strokeDasharray="1" />
-                  <path d="M38 100 L 20 112 L 38 124" stroke="#1a4fc4" strokeOpacity="0.55" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
-                    className="transition-transform duration-700 group-hover:-translate-x-1" />
                   <defs>
                     <linearGradient id="joinArrow" x1="1" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#4a90e2" stopOpacity="0" />
-                      <stop offset="100%" stopColor="#1a4fc4" stopOpacity="0.55" />
+                      <stop offset="100%" stopColor="#1a4fc4" stopOpacity="0.45" />
                     </linearGradient>
+                    <radialGradient id="joinDot">
+                      <stop offset="0%" stopColor="#ffffff" />
+                      <stop offset="45%" stopColor="#4a90e2" />
+                      <stop offset="100%" stopColor="#4a90e2" stopOpacity="0" />
+                    </radialGradient>
                   </defs>
+                  <path d="M190 16 C 150 8, 110 28, 96 62 C 84 92, 62 110, 26 113" stroke="url(#joinArrow)" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 6" className="transition-opacity duration-500 opacity-70 group-hover:opacity-100" />
+                  <path d="M40 104 L 25 113 L 40 122" stroke="#1a4fc4" strokeOpacity="0.5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                    className="transition-transform duration-500 group-hover:-translate-x-1.5" />
+                  <circle r="7" fill="url(#joinDot)">
+                    <animateMotion dur="3.4s" repeatCount="indefinite" path="M190 16 C 150 8, 110 28, 96 62 C 84 92, 62 110, 26 113" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.45 0 0.25 1" />
+                    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.82;1" dur="3.4s" repeatCount="indefinite" />
+                  </circle>
                 </svg>
                 <div className="relative">
                 <h3 className="font-heading font-bold text-xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t.joinTitle}</h3>

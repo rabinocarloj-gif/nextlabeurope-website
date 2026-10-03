@@ -12,10 +12,10 @@ export default function PartnersSection({ lang }) {
   return (
     <section className="relative py-32 lg:py-44 overflow-hidden" style={{ backgroundColor: '#f8f9fc' }}>
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="aurora absolute -top-40 left-[10%] w-[520px] h-[520px] rounded-full"
+        <div className="glide-x absolute -top-40 left-[25%] w-[640px] h-[640px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.14) 0%, rgba(74,144,226,0) 70%)' }} />
-        <div className="aurora absolute -bottom-48 right-[5%] w-[560px] h-[560px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(26,79,196,0.10) 0%, rgba(26,79,196,0) 70%)', animationDelay: '-9s' }} />
+        <div className="glide-x-rev absolute -bottom-48 right-[20%] w-[620px] h-[620px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(26,79,196,0.10) 0%, rgba(26,79,196,0) 70%)', }} />
         <div className="absolute left-0 right-0 bottom-[12%] h-40 opacity-60">
           <svg className="wave-flow h-full" style={{ width: '200%' }} viewBox="0 0 2400 160" preserveAspectRatio="none">
             <path d="M0 80 C 200 20, 400 140, 600 80 S 1000 20, 1200 80 S 1600 140, 1800 80 S 2200 20, 2400 80" fill="none" stroke="rgba(26,79,196,0.14)" strokeWidth="1.2" />
@@ -52,7 +52,7 @@ export default function PartnersSection({ lang }) {
         </div>
         <p className="text-center text-sm" style={{ color: '#6b7280' }}>
           {t.note}{' '}
-          <Link to="/contatti?motivo=collaborazione" className="text-link font-semibold" style={{ color: '#1a4fc4' }}>{t.cta} →</Link>
+          <Link to="/contatti?motivo=collaborazione" className="text-link font-semibold" style={{ color: '#1a4fc4' }}>{t.cta}</Link>
         </p>
       </div>
     </section>

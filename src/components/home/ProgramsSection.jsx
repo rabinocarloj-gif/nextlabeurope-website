@@ -95,7 +95,7 @@ export default function ProgramsSection({ lang }) {
                   </span>
                 </div>
                 <span className="absolute left-8 bottom-6 font-heading font-extrabold leading-none select-none"
-                  style={{ fontSize: '3.5rem', color: 'rgba(26,79,196,0.12)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{project.num}</span>
+                  style={{ fontSize: '3.5rem', color: '#ffffff', textShadow: '0 6px 18px rgba(26,79,196,0.22)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{project.num}</span>
               </div>
               <div className="p-8 lg:p-10">
                 <h3 className="font-heading font-bold text-2xl mb-4 transition-colors duration-500 group-hover:text-[#1a4fc4]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>

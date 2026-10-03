@@ -104,9 +104,9 @@
   60% { opacity: 0.92; filter: blur(0.4px); }
   100% { opacity: 1; filter: blur(0); transform: none; }
 }
-.lang-swap { animation: lang-swap .9s cubic-bezier(0.16, 1, 0.3, 1); }
+.lang-swap { animation: lang-swap 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes lang-swap-soft { from { opacity: 0; letter-spacing: 0.32em; } to { opacity: 1; } }
-.lang-swap-soft { animation: lang-swap-soft .8s cubic-bezier(0.16, 1, 0.3, 1); }
+.lang-swap-soft { animation: lang-swap-soft 1.3s cubic-bezier(0.16, 1, 0.3, 1); }
 
 /* Luccichio ripetuto (ogni 7,5 secondi) */
 .shimmer-loop {
@@ -164,4 +164,28 @@
 @media (prefers-reduced-motion: reduce) {
   .shimmer-once, .aurora, .lang-swap, .lang-swap-soft, .shimmer-loop, .dots-drift, .wave-flow, .kenburns, .bloom-in { animation: none; }
   .shimmer-once { background-position: 0 0; }
+}
+
+/* Razzo che decolla */
+@keyframes rocket-launch {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  15% { transform: translate(-1px, 1px) rotate(-4deg); }
+  45% { transform: translate(18px, -22px) rotate(0deg); opacity: 0; }
+  46% { transform: translate(-16px, 20px); opacity: 0; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+.group:hover .mission-rocket { animation: rocket-launch 1.3s cubic-bezier(0.45, 0, 0.25, 1); }
+
+/* Sfumatura che si sposta da un lato all'altro */
+@keyframes glide-x { 0%, 100% { transform: translateX(-35%); } 50% { transform: translateX(35%); } }
+.glide-x { animation: glide-x 16s ease-in-out infinite; }
+@keyframes glide-x-rev { 0%, 100% { transform: translateX(30%); } 50% { transform: translateX(-30%); } }
+.glide-x-rev { animation: glide-x-rev 20s ease-in-out infinite; }
+
+/* Punto che scorre lungo il percorso verso il pulsante */
+@keyframes path-dash { to { stroke-dashoffset: -24; } }
+.path-dash { animation: path-dash 1.6s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .mission-rocket, .glide-x, .glide-x-rev, .path-dash { animation: none; }
 }

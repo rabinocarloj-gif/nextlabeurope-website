@@ -38,8 +38,8 @@ function EuropeanRing({ sectionRef }) {
     let angle = 0, speed = 360 / 140, last = performance.now(), raf;
     const tick = (now) => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      const target = goldRef.current ? 360 / 22 : 360 / 140;
-      speed += (target - speed) * Math.min(1, dt * 1.6);
+      const target = goldRef.current ? 360 / 5 : 360 / 140;
+      speed += (target - speed) * Math.min(1, dt * 2.2);
       angle = (angle + speed * dt) % 360;
       if (svgRef.current) svgRef.current.style.transform = `rotate(${angle}deg)`;
       raf = requestAnimationFrame(tick);
@@ -78,7 +78,7 @@ function EuropeanRing({ sectionRef }) {
   };
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div ref={wrapRef} className={`${gold ? 'is-gold ' : ''}eu-ring-wrap absolute -top-16 -right-40 w-[360px] h-[360px] opacity-25 sm:opacity-40 sm:w-[480px] sm:h-[480px] sm:-right-32 lg:opacity-90 lg:w-[600px] lg:h-[600px] lg:top-1/2 lg:-translate-y-1/2 lg:right-[-2%]`}>
+      <div ref={wrapRef} className={`${gold ? 'is-gold ' : ''}eu-ring-wrap absolute -top-16 -right-40 w-[360px] h-[360px] opacity-25 sm:opacity-40 sm:w-[480px] sm:h-[480px] sm:-right-32 lg:opacity-90 lg:w-[640px] lg:h-[640px] lg:-top-16 lg:-right-32`}>
         <div className="eu-glow absolute inset-[12%] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.20) 0%, rgba(26,79,196,0.10) 45%, rgba(26,79,196,0) 72%)', filter: 'blur(10px)' }} />
         <div className="eu-glow-gold absolute inset-[6%] rounded-full"
@@ -139,7 +139,7 @@ export default function HeroSection({ lang, heroImage }) {
               </motion.h1>
             ))}
             <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }}
-              className="font-heading font-extrabold leading-[0.95] tracking-tight shimmer-once"
+              className="font-heading font-extrabold leading-[0.95] tracking-tight shimmer-loop italic"
               style={{ fontSize: 'clamp(2.25rem, 6vw, 5.25rem)', fontFamily: "'Plus Jakarta Sans', sans-serif", paddingBottom: '0.14em', paddingRight: '0.12em', marginBottom: '-0.14em', display: 'inline-block' }}>
               {t.title3}
             </motion.h1>
