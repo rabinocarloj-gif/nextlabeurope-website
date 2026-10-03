@@ -25,7 +25,7 @@ function useScrollOnNavigate() {
 // Titolo, descrizione e indirizzo canonico per ogni pagina (letti da Google)
 const SEO = {
   '/': {
-    it: ["Next Lab Europe APS", "Next Lab Europe APS è un'associazione di promozione sociale di Lugo (RA) che promuove imprenditorialità giovanile, formazione e valori europei per una nuova generazione di cittadini attivi."],
+    it: ["Next Lab Europe APS", "Next Lab Europe APS è un'associazione di promozione sociale di Lugo (RA) che promuove l'imprenditoria giovanile e lo sviluppo dei territori in una prospettiva europea, diffonde i valori dell'Unione e forma una nuova generazione di cittadini motivati e attivi."],
     en: ['Next Lab Europe APS', 'Next Lab Europe APS is a social promotion association based in Lugo (Italy) promoting youth entrepreneurship, education and European values for a new generation of active citizens.'],
   },
   '/contatti': {
@@ -68,11 +68,20 @@ export default function SiteLayout() {
   const [lang, setLang] = useState('it');
   useScrollOnNavigate();
   useSeo(lang);
+  const swapRef = useRef(null);
+  const firstLang = useRef(true);
+  useEffect(() => {
+    if (firstLang.current) { firstLang.current = false; return; }
+    const el = swapRef.current; if (!el) return;
+    el.classList.remove('lang-swap'); void el.offsetWidth; el.classList.add('lang-swap');
+  }, [lang]);
   return (
     <div className="min-h-screen bg-background lattice-line">
       <Navbar lang={lang} setLang={setLang} />
-      <main><Outlet context={{ lang }} /></main>
-      <Footer lang={lang} />
+      <div ref={swapRef}>
+        <main><Outlet context={{ lang }} /></main>
+        <Footer lang={lang} />
+      </div>
     </div>
   );
 }

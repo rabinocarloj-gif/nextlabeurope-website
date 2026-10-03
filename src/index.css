@@ -49,3 +49,88 @@
 @media (prefers-reduced-motion: reduce) {
   .eu-ring, .eu-glow, .eu-star { animation: none; }
 }
+
+/* ===== Effetti interattivi ===== */
+
+/* Luccichio iniziale su "insieme." */
+.shimmer-once {
+  font-style: italic;
+  background: linear-gradient(110deg, #1a4fc4 0%, #4a90e2 35%, #dbe8ff 47%, #4a90e2 59%, #1a3a8c 100%);
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-sweep 2.4s cubic-bezier(0.22, 1, 0.36, 1) 1.1s 1 forwards;
+}
+@keyframes shimmer-sweep {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0% 0; }
+}
+
+/* Link del menu (sfondo chiaro): si illuminano di blu */
+.nav-link { color: rgba(15,15,15,0.6) !important; position: relative; transition: color .35s ease, text-shadow .35s ease; }
+.nav-link::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 1px;
+  background: linear-gradient(to right, transparent, #1a4fc4, transparent);
+  transform: scaleX(0); transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link:hover { color: #1a4fc4 !important; text-shadow: 0 0 14px rgba(74,144,226,0.45); }
+.nav-link:hover::after { transform: scaleX(1); }
+
+/* Link del footer (sfondo scuro): si accendono di una luce azzurra */
+.footer-link { transition: color .35s ease, text-shadow .35s ease, transform .35s ease; display: inline-block; }
+.footer-link:hover { color: #ffffff !important; text-shadow: 0 0 12px rgba(120,170,255,0.75), 0 0 28px rgba(74,144,226,0.35); transform: translateX(3px); }
+
+/* Link testuali blu */
+.text-link { transition: color .3s ease, text-shadow .3s ease; }
+.text-link:hover { color: #4a90e2 !important; text-shadow: 0 0 12px rgba(74,144,226,0.4); }
+
+/* Pulsanti principali: da blu pieno a sfumatura luminosa */
+.btn-glow {
+  background-image: linear-gradient(120deg, #1a4fc4 0%, #1a4fc4 45%, #3f7fe0 75%, #6aa6f0 100%);
+  background-size: 220% 100%; background-position: 0% 0;
+  transition: background-position .6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow .45s ease, transform .45s ease !important;
+}
+.btn-glow:hover {
+  background-position: 100% 0;
+  box-shadow: 0 10px 30px -8px rgba(26,79,196,0.55), 0 0 0 4px rgba(74,144,226,0.12);
+  transform: translateY(-2px);
+}
+
+/* Transizione al cambio lingua */
+@keyframes lang-swap {
+  0% { opacity: 0.15; filter: blur(6px); transform: translateY(6px); }
+  100% { opacity: 1; filter: blur(0); transform: none; }
+}
+.lang-swap { animation: lang-swap .6s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* Stelle che diventano dorate al passaggio del mouse */
+.eu-gold { opacity: 0; transition: opacity 1.1s ease; }
+.eu-ring-hover:hover .eu-gold { opacity: 0.9; }
+.eu-glow-gold { opacity: 0; transition: opacity 1.1s ease; }
+.eu-ring-hover:hover .eu-glow-gold { opacity: 1; }
+
+/* Bordo sfumato animato per card */
+.card-glow { position: relative; isolation: isolate; }
+.card-glow::before {
+  content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; z-index: -1;
+  background: linear-gradient(135deg, rgba(26,79,196,0.0), rgba(74,144,226,0.0));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  transition: background .6s ease;
+}
+.card-glow:hover::before { background: linear-gradient(135deg, #1a4fc4, #6aa6f0 50%, rgba(242,201,76,0.8)); }
+
+/* Aurora animata per intestazioni */
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(4%, -3%) scale(1.08); }
+  66% { transform: translate(-3%, 4%) scale(0.96); }
+}
+.aurora { animation: aurora-drift 18s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-once, .aurora, .lang-swap { animation: none; }
+  .shimmer-once { background-position: 0 0; }
+}

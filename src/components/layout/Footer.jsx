@@ -49,7 +49,7 @@ export default function Footer({ lang }) {
               <p className="pt-1">{t.phone}</p>
               <p>{t.cf}</p>
               <p>{t.runts}</p>
-              <p><a href={`mailto:${t.email}`} className="transition-colors hover:text-white">{t.email}</a></p>
+              <p><a href={`mailto:${t.email}`} className="footer-link">{t.email}</a></p>
             </div>
           </div>
           <div className="space-y-6">
@@ -57,10 +57,10 @@ export default function Footer({ lang }) {
               {lang === 'it' ? 'Navigazione' : 'Navigation'}
             </h4>
             <div className="flex flex-col gap-3">
-              <Link to="/" className="text-sm transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.nav.home}</Link>
-              <Link to="/#chi-siamo" className="text-sm transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.nav.about}</Link>
-              <Link to="/#progetti" className="text-sm transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.nav.programs}</Link>
-              <Link to="/contatti" className="text-sm transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.nav.contact}</Link>
+              <Link to="/" className="footer-link text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.nav.home}</Link>
+              <Link to="/#chi-siamo" className="footer-link text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.nav.about}</Link>
+              <Link to="/#progetti" className="footer-link text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.nav.programs}</Link>
+              <Link to="/contatti" className="footer-link text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.nav.contact}</Link>
             </div>
           </div>
           <div className="space-y-6">
@@ -68,10 +68,10 @@ export default function Footer({ lang }) {
               {lang === 'it' ? 'Legale' : 'Legal'}
             </h4>
             <div className="flex flex-col gap-3">
-              <Link to="/privacy" className="text-sm text-left transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>Privacy Policy</Link>
-              <Link to="/cookie-policy" className="text-sm text-left transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>Cookie Policy</Link>
+              <Link to="/privacy" className="footer-link text-sm text-left" style={{ color: 'rgba(255,255,255,0.4)' }}>Privacy Policy</Link>
+              <Link to="/cookie-policy" className="footer-link text-sm text-left" style={{ color: 'rgba(255,255,255,0.4)' }}>Cookie Policy</Link>
               <a href="/documents/statuto-next-lab-europe-aps.pdf" target="_blank" rel="noopener noreferrer"
-                className="text-sm transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                className="footer-link text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 {t.statuto}
               </a>
             </div>

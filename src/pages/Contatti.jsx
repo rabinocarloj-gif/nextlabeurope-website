@@ -126,8 +126,12 @@ export default function Contatti() {
     <>
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0">
-          <img src={CONTACT_IMG} alt="" className="w-full h-full object-cover" />
+          <div aria-hidden="true" className="w-full h-full" style={{ backgroundImage: `url(${CONTACT_IMG})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(252,252,252,0.95), rgba(252,252,252,0.9), rgba(252,252,252,1))' }} />
+          <div aria-hidden="true" className="aurora absolute -top-32 right-[8%] w-[560px] h-[560px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.18) 0%, rgba(74,144,226,0) 70%)' }} />
+          <div aria-hidden="true" className="aurora absolute top-24 right-[30%] w-[380px] h-[380px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(242,201,76,0.10) 0%, rgba(242,201,76,0) 70%)', animationDelay: '-7s' }} />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-16">
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
@@ -165,10 +169,10 @@ export default function Contatti() {
                     <div className="h-px w-full mb-6" style={{ background: 'linear-gradient(to right, rgba(26,79,196,0.25), rgba(26,79,196,0))' }} />
                     <p className="text-sm leading-relaxed mb-8" style={{ color: '#4b5563' }}>
                       {t.sentMore}{' '}
-                      <a href="mailto:info@nextlabeurope.eu" className="transition-opacity hover:opacity-70" style={{ color: '#1a4fc4' }}>info@nextlabeurope.eu</a>
+                      <a href="mailto:info@nextlabeurope.eu" className="text-link" style={{ color: '#1a4fc4' }}>info@nextlabeurope.eu</a>
                     </p>
                     <button type="button" onClick={() => setStatus('idle')}
-                      className="text-sm transition-opacity hover:opacity-70"
+                      className="text-link text-sm"
                       style={{ color: '#1a4fc4', fontWeight: 400, textDecoration: 'none' }}>
                       {t.sendAnother}
                     </button>
@@ -180,14 +184,14 @@ export default function Contatti() {
                   <label htmlFor="cf-name" className={labelCls} style={labelStyle}>{t.nameLabel}</label>
                   <input id="cf-name" type="text" autoComplete="name" required minLength={2} maxLength={120}
                     value={form.name} onChange={update('name')}
-                    className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-blue-200"
+                    className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all focus:ring-4 focus:ring-blue-100 focus:border-[#1a4fc4] hover:border-[#c7d6f5]"
                     style={fieldStyle('name')} />
                 </div>
                 <div>
                   <label htmlFor="cf-email" className={labelCls} style={labelStyle}>{t.emailLabel}</label>
                   <input id="cf-email" type="email" autoComplete="email" required maxLength={200}
                     value={form.email} onChange={update('email')}
-                    className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-blue-200"
+                    className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all focus:ring-4 focus:ring-blue-100 focus:border-[#1a4fc4] hover:border-[#c7d6f5]"
                     style={fieldStyle('email')} />
                 </div>
                 <div>
@@ -196,7 +200,7 @@ export default function Contatti() {
                     {t.reasons.map(([key, label]) => (
                       <button key={key} type="button" role="radio" aria-checked={form.reason === key}
                         onClick={() => setForm((f) => ({ ...f, reason: key }))}
-                        className="px-4 py-2 rounded-full text-sm transition-all"
+                        className="px-4 py-2 rounded-full text-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_16px_-8px_rgba(26,79,196,0.45)]"
                         style={form.reason === key
                           ? { backgroundColor: '#1a4fc4', color: '#fff', border: '1.5px solid #1a4fc4' }
                           : { backgroundColor: '#fff', color: '#374151', border: '1.5px solid #e5e7eb' }}>
@@ -212,7 +216,7 @@ export default function Contatti() {
                   )}
                   <textarea id="cf-message" ref={messageRef} rows={6} required minLength={10} maxLength={5000}
                     placeholder={t.messagePlaceholder} value={form.message} onChange={update('message')}
-                    className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-y transition-all focus:ring-2 focus:ring-blue-200"
+                    className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-y transition-all focus:ring-4 focus:ring-blue-100 focus:border-[#1a4fc4] hover:border-[#c7d6f5]"
                     style={fieldStyle('message')} />
                 </div>
                 {/* Campo trappola per i bot: invisibile alle persone */}
@@ -226,8 +230,8 @@ export default function Contatti() {
                   </p>
                 )}
                 <button type="submit" disabled={status === 'sending'}
-                  className="w-full py-4 font-heading font-bold text-sm tracking-wide rounded-full text-white transition-all disabled:opacity-70"
-                  style={{ backgroundColor: '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  className="btn-glow w-full py-4 font-heading font-bold text-sm tracking-wide rounded-full text-white disabled:opacity-70"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   {status === 'sending' ? t.sending : t.submit}
                 </button>
                 <p className="text-xs leading-relaxed" style={{ color: '#6b7280' }}>
@@ -242,14 +246,14 @@ export default function Contatti() {
               <h2 className="font-heading font-extrabold text-3xl mb-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t.infoTitle}</h2>
               <div className="space-y-6 mb-10">
                 <div className="flex gap-4">
-                  <span className="text-xl" style={{ color: '#1a4fc4' }}>✉</span>
+                  <span className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(140deg, #eff4ff, #fff)', border: '1px solid rgba(26,79,196,0.14)', boxShadow: '0 8px 20px -12px rgba(26,79,196,0.5)' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a4fc4" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="M4 7l8 6 8-6" /></svg></span>
                   <div>
                     <strong className="block text-xs uppercase tracking-widest mb-1" style={{ color: '#9ca3af', fontFamily: "'JetBrains Mono', monospace" }}>Email</strong>
-                    <a href={`mailto:${t.email}`} className="hover:underline">{t.email}</a>
+                    <a href={`mailto:${t.email}`} className="text-link">{t.email}</a>
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <span className="text-xl" style={{ color: '#1a4fc4' }}>◎</span>
+                  <span className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(140deg, #eff4ff, #fff)', border: '1px solid rgba(26,79,196,0.14)', boxShadow: '0 8px 20px -12px rgba(26,79,196,0.5)' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a4fc4" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0114 0C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg></span>
                   <div>
                     <strong className="block text-xs uppercase tracking-widest mb-1" style={{ color: '#9ca3af', fontFamily: "'JetBrains Mono', monospace" }}>
                       {lang === 'it' ? 'Sede' : 'Location'}
@@ -260,13 +264,21 @@ export default function Contatti() {
                   </div>
                 </div>
               </div>
-              <div className="p-7 rounded-2xl" style={{ backgroundColor: '#eff4ff', borderLeft: '4px solid #1a4fc4' }}>
+              <div className="card-glow group relative p-8 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-1"
+                style={{ background: 'linear-gradient(145deg, #eff4ff 0%, #f8faff 60%, #ffffff 100%)', border: '1px solid rgba(26,79,196,0.14)', boxShadow: '0 20px 40px -28px rgba(26,79,196,0.45)' }}>
+                <div aria-hidden="true" className="absolute -right-10 -bottom-10 w-44 h-44 opacity-[0.08] transition-transform duration-[1400ms] group-hover:rotate-45">
+                  <svg viewBox="0 0 100 100" fill="#1a4fc4">
+                    {Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * Math.PI * 2; return <circle key={i} cx={50 + Math.cos(a) * 38} cy={50 + Math.sin(a) * 38} r="4" />; })}
+                  </svg>
+                </div>
+                <div className="relative">
                 <h3 className="font-heading font-bold text-xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t.joinTitle}</h3>
                 <p className="text-sm leading-relaxed mb-5" style={{ color: '#6b7280' }}>{t.joinDesc}</p>
-                <button type="button" onClick={chooseJoin} className="px-6 py-3 font-heading font-bold text-sm rounded-full text-white"
-                  style={{ backgroundColor: '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <button type="button" onClick={chooseJoin} className="btn-glow px-8 py-3 font-heading font-bold text-sm rounded-full text-white"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   {t.joinCta}
                 </button>
+                </div>
               </div>
             </motion.div>
           </div>

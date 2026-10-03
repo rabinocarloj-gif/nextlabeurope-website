@@ -72,8 +72,7 @@ export default function Navbar({ lang, setLang }) {
                 key={link.label}
                 to={link.to}
                 onClick={handleNavClick}
-                className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/60 hover:text-primary transition-colors duration-300"
-                style={{ color: '#0F0F0F99' }}
+                className="nav-link font-mono text-xs uppercase tracking-[0.2em]"
               >
                 {link.label}
               </Link>

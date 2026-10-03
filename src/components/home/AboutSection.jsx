@@ -28,6 +28,20 @@ const team = [
   },
 ];
 
+// Icone a linea dei tre pilastri
+const PILLAR_ICONS = [
+  // Imprenditoria: razzo/crescita
+  <path key="a" d="M4 16l5-5 4 4 7-7M14 8h6v6" />,
+  // Formazione: libro aperto
+  <path key="b" d="M3 6.5C5.5 5 8.5 5 12 7c3.5-2 6.5-2 9-.5V19c-2.5-1.5-5.5-1.5-9 .5-3.5-2-6.5-2-9-.5zM12 7v12.5" />,
+  // Valori europei: stella
+  <path key="c" d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9z" />,
+];
+
+function initials(name) {
+  return name.split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('');
+}
+
 const translations = {
   it: {
     label: '01 / CHI SIAMO',
@@ -93,16 +107,21 @@ export default function AboutSection({ lang, aboutImage }) {
             {t.pillars.map((pillar, i) => (
               <motion.div key={pillar.num} initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.15 }}
-                className="relative group py-10 first:pt-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
-                <motion.span aria-hidden="true" initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
-                  transition={{ duration: 1.1, delay: 0.25 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute left-0 bottom-[-1px] h-px w-full origin-left"
-                  style={{ background: 'linear-gradient(to right, #1a4fc4, rgba(74,144,226,0.4), rgba(74,144,226,0))' }} />
-                <div className="relative z-10">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.4em] mb-3" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
+                className="relative group py-9 first:pt-0 flex gap-6 items-start" style={{ borderBottom: '1px solid #ececf1' }}>
+                <div className="relative shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:-translate-y-1"
+                  style={{ background: 'linear-gradient(140deg, #eff4ff 0%, #ffffff 100%)', border: '1px solid rgba(26,79,196,0.14)', boxShadow: '0 10px 24px -14px rgba(26,79,196,0.45)' }}>
+                  <span aria-hidden="true" className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{ background: 'linear-gradient(140deg, #1a4fc4 0%, #4a90e2 100%)' }} />
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+                    className="relative transition-colors duration-500 stroke-[#1a4fc4] group-hover:stroke-white">
+                    {PILLAR_ICONS[i]}
+                  </svg>
+                </div>
+                <div className="relative z-10 pt-1">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.4em] mb-2" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
                     {pillar.num} / {lang === 'it' ? 'Pilastro' : 'Pillar'}
                   </p>
-                  <h3 className="font-heading font-bold text-2xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{pillar.title}</h3>
+                  <h3 className="font-heading font-bold text-2xl mb-2 transition-colors duration-500 group-hover:text-[#1a4fc4]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{pillar.title}</h3>
                   <p className="leading-relaxed text-sm" style={{ color: '#6b7280' }}>{pillar.desc}</p>
                 </div>
               </motion.div>
@@ -126,20 +145,30 @@ export default function AboutSection({ lang, aboutImage }) {
           </div>
 
           <div ref={scrollerRef}
-            className="flex gap-6 overflow-x-auto pb-4 -mx-6 px-6 lg:mx-0 lg:px-0"
+            className="flex gap-6 overflow-x-auto pt-2 pb-6 -mx-6 px-6 lg:mx-0 lg:px-0"
             style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none' }}>
             {team.map((person, i) => (
-              <motion.div key={person.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className="shrink-0 w-[300px] lg:w-[320px] p-8 rounded-2xl"
-                style={{ border: '1.5px solid #f3f4f6', scrollSnapAlign: 'start' }}>
-                <p className="font-mono text-[10px] uppercase tracking-[0.4em] mb-4" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
-                  {person.role[lang]}
-                </p>
-                <h4 className="font-heading font-bold text-xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <motion.div key={person.name} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ delay: i * 0.12, duration: 0.6 }}
+                className="card-glow group relative shrink-0 w-[300px] lg:w-[340px] p-8 rounded-3xl bg-white overflow-hidden transition-all duration-500 hover:-translate-y-1.5"
+                style={{ border: '1px solid #ececf1', scrollSnapAlign: 'start', boxShadow: '0 1px 2px rgba(15,15,15,0.03)' }}>
+                <span aria-hidden="true" className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                  style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.18) 0%, rgba(74,144,226,0) 70%)' }} />
+                <div className="relative flex items-center gap-4 mb-6">
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center font-heading font-bold text-white text-lg transition-transform duration-500 group-hover:scale-105"
+                    style={{ background: 'linear-gradient(140deg, #1a4fc4 0%, #4a90e2 100%)', boxShadow: '0 10px 22px -10px rgba(26,79,196,0.7)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    {initials(person.name)}
+                  </div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.3em] leading-relaxed" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
+                    {person.role[lang]}
+                  </p>
+                </div>
+                <h4 className="relative font-heading font-bold text-xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   {person.name}
                 </h4>
-                <p className="leading-relaxed text-sm" style={{ color: '#6b7280' }}>
+                <span aria-hidden="true" className="relative block h-px w-10 mb-4 transition-all duration-500 group-hover:w-24"
+                  style={{ background: 'linear-gradient(to right, #1a4fc4, rgba(74,144,226,0))' }} />
+                <p className="relative leading-relaxed text-sm" style={{ color: '#6b7280' }}>
                   {person.bio[lang]}
                 </p>
               </motion.div>
@@ -147,10 +176,10 @@ export default function AboutSection({ lang, aboutImage }) {
           </div>
           <div className="flex justify-center gap-3 mt-8">
             <button onClick={() => scrollByCard(-1)} aria-label="Previous"
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              className="w-11 h-11 rounded-full flex items-center justify-center bg-white transition-all duration-300 hover:text-white hover:bg-[#1a4fc4] hover:border-[#1a4fc4] hover:shadow-[0_8px_20px_-8px_rgba(26,79,196,0.6)]"
               style={{ border: '1.5px solid #e5e7eb' }}>‹</button>
             <button onClick={() => scrollByCard(1)} aria-label="Next"
-              className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              className="w-11 h-11 rounded-full flex items-center justify-center bg-white transition-all duration-300 hover:text-white hover:bg-[#1a4fc4] hover:border-[#1a4fc4] hover:shadow-[0_8px_20px_-8px_rgba(26,79,196,0.6)]"
               style={{ border: '1.5px solid #e5e7eb' }}>›</button>
           </div>
         </div>
