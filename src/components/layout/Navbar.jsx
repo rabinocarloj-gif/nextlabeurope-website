@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const LOGO_URL = "/logo-next-lab-europe.png";
+const LOGO_URL = "/logo-next-lab-europe-simbolo.png";
 
 const translations = {
   it: { home: 'Home', about: 'Chi Siamo', programs: 'Progetti', contact: 'Contatti' },
