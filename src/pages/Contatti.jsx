@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-const CONTACT_IMG = '/images/contatti.jpg';
 
 const translations = {
   it: {
@@ -126,17 +125,21 @@ export default function Contatti() {
   return (
     <>
       <section className="relative pt-32 pb-20 overflow-hidden">
-        <div className="absolute inset-0">
-          <div aria-hidden="true" className="kenburns-loop w-full h-full" style={{ backgroundImage: `url(${CONTACT_IMG})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(252,252,252,0.95), rgba(252,252,252,0.9), rgba(252,252,252,1))' }} />
-          <div aria-hidden="true" className="bloom-in absolute inset-0" style={{ background: 'radial-gradient(120% 80% at 85% 0%, rgba(74,144,226,0.14) 0%, rgba(74,144,226,0) 55%)' }} />
-          <div aria-hidden="true" className="dots-drift absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(26,79,196,0.10) 1px, transparent 1px)', backgroundSize: '28px 28px', maskImage: 'linear-gradient(to bottom, #000 0%, transparent 85%)', WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, transparent 85%)' }} />
-          <div aria-hidden="true" className="glide-x absolute -top-40 left-[30%] w-[700px] h-[700px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.20) 0%, rgba(74,144,226,0) 68%)' }} />
-          <div aria-hidden="true" className="aurora absolute -top-32 right-[8%] w-[560px] h-[560px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.18) 0%, rgba(74,144,226,0) 70%)' }} />
-          <div aria-hidden="true" className="aurora absolute top-24 right-[30%] w-[380px] h-[380px] rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(242,201,76,0.10) 0%, rgba(242,201,76,0) 70%)', animationDelay: '-7s' }} />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: '#f8f9fc', maskImage: 'linear-gradient(to bottom, #000 0%, #000 62%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, #000 62%, transparent 100%)' }}>
+          <div className="glide-x absolute -top-48 left-[20%] w-[720px] h-[720px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.22) 0%, rgba(74,144,226,0) 68%)' }} />
+          <div className="glide-x-rev absolute -bottom-56 right-[15%] w-[680px] h-[680px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(26,79,196,0.14) 0%, rgba(26,79,196,0) 68%)' }} />
+          <div className="aurora absolute top-10 right-[32%] w-[420px] h-[420px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(242,201,76,0.12) 0%, rgba(242,201,76,0) 70%)', animationDelay: '-6s' }} />
+          <div className="dots-drift absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(26,79,196,0.12) 1px, transparent 1px)', backgroundSize: '26px 26px', maskImage: 'radial-gradient(ellipse at 60% 40%, #000 25%, transparent 75%)', WebkitMaskImage: 'radial-gradient(ellipse at 60% 40%, #000 25%, transparent 75%)' }} />
+          <div className="absolute left-0 right-0 bottom-[6%] h-36 opacity-60">
+            <svg className="wave-flow h-full" style={{ width: '200%' }} viewBox="0 0 2400 160" preserveAspectRatio="none">
+              <path d="M0 80 C 200 20, 400 140, 600 80 S 1000 20, 1200 80 S 1600 140, 1800 80 S 2200 20, 2400 80" fill="none" stroke="rgba(26,79,196,0.14)" strokeWidth="1.2" />
+              <path d="M0 100 C 200 50, 400 150, 600 100 S 1000 50, 1200 100 S 1600 150, 1800 100 S 2200 50, 2400 100" fill="none" stroke="rgba(74,144,226,0.12)" strokeWidth="1" />
+              <path d="M0 60 C 200 110, 400 10, 600 60 S 1000 110, 1200 60 S 1600 10, 1800 60 S 2200 110, 2400 60" fill="none" stroke="rgba(242,201,76,0.16)" strokeWidth="1" />
+            </svg>
+          </div>
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-16">
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
