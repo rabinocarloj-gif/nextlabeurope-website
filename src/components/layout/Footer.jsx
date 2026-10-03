@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LegalModal from './LegalModal';
 
-const LOGO_URL = "/logo-next-lab-europe.png";
+const LOGO_URL = "/logo-next-lab-europe-bianco.png";
 
 const translations = {
   it: {
