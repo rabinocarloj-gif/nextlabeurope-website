@@ -51,7 +51,7 @@ export default function HeroSection({ lang, heroImage }) {
             ))}
             <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }}
               className="font-heading font-extrabold leading-[0.95] tracking-tight text-blue-gradient"
-              style={{ fontSize: 'clamp(2.25rem, 6vw, 5.25rem)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              style={{ fontSize: 'clamp(2.25rem, 6vw, 5.25rem)', fontFamily: "'Plus Jakarta Sans', sans-serif", paddingBottom: '0.14em', paddingRight: '0.12em', marginBottom: '-0.14em', display: 'inline-block' }}>
               {t.title3}
             </motion.h1>
           </div>
