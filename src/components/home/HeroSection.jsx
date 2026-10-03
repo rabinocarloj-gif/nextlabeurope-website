@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -25,7 +25,44 @@ const translations = {
 };
 
 // Anello di 12 stelle ispirato alla bandiera europea, in rotazione lentissima
-function EuropeanRing() {
+function EuropeanRing({ sectionRef }) {
+  const wrapRef = useRef(null);
+  const svgRef = useRef(null);
+  const [gold, setGold] = useState(false);
+  const goldRef = useRef(false);
+
+  // Rotazione gestita a mano: lenta di base, accelera dolcemente quando le stelle diventano dorate
+  useEffect(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return undefined;
+    let angle = 0, speed = 360 / 140, last = performance.now(), raf;
+    const tick = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      const target = goldRef.current ? 360 / 22 : 360 / 140;
+      speed += (target - speed) * Math.min(1, dt * 1.6);
+      angle = (angle + speed * dt) % 360;
+      if (svgRef.current) svgRef.current.style.transform = `rotate(${angle}deg)`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  // Area sensibile ampia: le stelle si accendono appena il mouse si avvicina all'anello
+  useEffect(() => {
+    const section = sectionRef.current; if (!section) return undefined;
+    const onMove = (e) => {
+      const r = wrapRef.current?.getBoundingClientRect(); if (!r) return;
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const near = Math.hypot(e.clientX - cx, e.clientY - cy) < r.width * 0.62;
+      if (near !== goldRef.current) { goldRef.current = near; setGold(near); }
+    };
+    const onLeave = () => { goldRef.current = false; setGold(false); };
+    section.addEventListener('mousemove', onMove);
+    section.addEventListener('mouseleave', onLeave);
+    return () => { section.removeEventListener('mousemove', onMove); section.removeEventListener('mouseleave', onLeave); };
+  }, [sectionRef]);
+
   const stars = Array.from({ length: 12 }, (_, i) => {
     const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
     return { x: 200 + Math.cos(a) * 150, y: 200 + Math.sin(a) * 150, delay: (i * 0.5).toFixed(1) };
@@ -41,20 +78,20 @@ function EuropeanRing() {
   };
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="eu-ring-hover pointer-events-auto absolute -top-16 -right-40 w-[360px] h-[360px] opacity-25 sm:opacity-40 sm:w-[480px] sm:h-[480px] sm:-right-32 lg:opacity-90 lg:w-[600px] lg:h-[600px] lg:top-1/2 lg:-translate-y-1/2 lg:right-[-2%]">
+      <div ref={wrapRef} className={`${gold ? 'is-gold ' : ''}eu-ring-wrap absolute -top-16 -right-40 w-[360px] h-[360px] opacity-25 sm:opacity-40 sm:w-[480px] sm:h-[480px] sm:-right-32 lg:opacity-90 lg:w-[600px] lg:h-[600px] lg:top-1/2 lg:-translate-y-1/2 lg:right-[-2%]`}>
         <div className="eu-glow absolute inset-[12%] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.20) 0%, rgba(26,79,196,0.10) 45%, rgba(26,79,196,0) 72%)', filter: 'blur(10px)' }} />
-        <div className="eu-glow-gold absolute inset-[12%] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(242,201,76,0.22) 0%, rgba(242,201,76,0.08) 45%, rgba(242,201,76,0) 72%)', filter: 'blur(12px)' }} />
-        <svg viewBox="0 0 400 400" className="eu-ring absolute inset-0 w-full h-full">
+        <div className="eu-glow-gold absolute inset-[6%] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(240,196,70,0.30) 0%, rgba(240,196,70,0.12) 45%, rgba(240,196,70,0) 72%)', filter: 'blur(14px)' }} />
+        <svg ref={svgRef} viewBox="0 0 400 400" className="absolute inset-0 w-full h-full" style={{ transformOrigin: '50% 50%' }}>
           <defs>
             <linearGradient id="euStar" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#4a90e2" />
               <stop offset="100%" stopColor="#1a4fc4" />
             </linearGradient>
             <linearGradient id="euGold" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#f7dc8a" />
-              <stop offset="100%" stopColor="#e3b53f" />
+              <stop offset="0%" stopColor="#f6d36b" />
+              <stop offset="100%" stopColor="#dfa52a" />
             </linearGradient>
           </defs>
           <circle cx="200" cy="200" r="150" fill="none" stroke="rgba(26,79,196,0.10)" strokeWidth="0.6" strokeDasharray="2 6" />
@@ -65,7 +102,7 @@ function EuropeanRing() {
           ))}
           <g className="eu-gold">
             {stars.map((st, i) => (
-              <polygon key={i} points={star(st.x, st.y, 11)} fill="url(#euGold)" />
+              <polygon key={i} points={star(st.x, st.y, 11.5)} fill="url(#euGold)" />
             ))}
           </g>
         </svg>
@@ -76,15 +113,16 @@ function EuropeanRing() {
 
 export default function HeroSection({ lang, heroImage }) {
   const t = translations[lang];
+  const sectionRef = useRef(null);
   const scrollToAbout = () => document.getElementById('chi-siamo')?.scrollIntoView({ behavior: 'smooth' });
 
   return (
-    <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-white">
+    <section ref={sectionRef} className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-white">
       <div className="absolute inset-0">
         <div aria-hidden="true" className="w-full h-full opacity-10" style={{ backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0.4), rgba(255,255,255,0.8))' }} />
       </div>
-      <EuropeanRing />
+      <EuropeanRing sectionRef={sectionRef} />
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-20 w-full pointer-events-none">
         <div className="max-w-4xl pointer-events-auto">
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}

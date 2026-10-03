@@ -100,16 +100,47 @@
 
 /* Transizione al cambio lingua */
 @keyframes lang-swap {
-  0% { opacity: 0.15; filter: blur(6px); transform: translateY(6px); }
+  0% { opacity: 0.25; filter: blur(3px); transform: translateY(4px); clip-path: inset(0 0 0 0); }
+  60% { opacity: 0.92; filter: blur(0.4px); }
   100% { opacity: 1; filter: blur(0); transform: none; }
 }
-.lang-swap { animation: lang-swap .6s cubic-bezier(0.22, 1, 0.36, 1); }
+.lang-swap { animation: lang-swap .9s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes lang-swap-soft { from { opacity: 0; letter-spacing: 0.32em; } to { opacity: 1; } }
+.lang-swap-soft { animation: lang-swap-soft .8s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Luccichio ripetuto (ogni 7,5 secondi) */
+.shimmer-loop {
+  background: linear-gradient(110deg, #1a4fc4 0%, #2d68d8 40%, #dfeaff 50%, #2d68d8 60%, #1a4fc4 100%);
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-loop 7.5s cubic-bezier(0.45, 0, 0.25, 1) 0.8s infinite;
+}
+@keyframes shimmer-loop {
+  0% { background-position: 100% 0; }
+  28% { background-position: 0% 0; }
+  100% { background-position: 0% 0; }
+}
+
+/* Sfondo animato continuo */
+@keyframes dots-drift { from { background-position: 0 0; } to { background-position: 260px 130px; } }
+.dots-drift { animation: dots-drift 40s linear infinite; }
+@keyframes wave-flow { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.wave-flow { animation: wave-flow 28s linear infinite; }
+
+/* Ingresso pagina contatti */
+@keyframes kenburns { from { transform: scale(1.12); } to { transform: scale(1); } }
+.kenburns { animation: kenburns 3.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes bloom-in { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: scale(1); } }
+.bloom-in { animation: bloom-in 1.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes draw-line { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
 /* Stelle che diventano dorate al passaggio del mouse */
-.eu-gold { opacity: 0; transition: opacity 1.1s ease; }
-.eu-ring-hover:hover .eu-gold { opacity: 0.9; }
-.eu-glow-gold { opacity: 0; transition: opacity 1.1s ease; }
-.eu-ring-hover:hover .eu-glow-gold { opacity: 1; }
+.eu-gold { opacity: 0; transition: opacity 1.2s ease; }
+.is-gold .eu-gold { opacity: 1; }
+.eu-glow-gold { opacity: 0; transition: opacity 1.2s ease; }
+.is-gold .eu-glow-gold { opacity: 1; }
 
 /* Bordo sfumato animato per card */
 .card-glow { position: relative; isolation: isolate; }
@@ -131,6 +162,6 @@
 .aurora { animation: aurora-drift 18s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .shimmer-once, .aurora, .lang-swap { animation: none; }
+  .shimmer-once, .aurora, .lang-swap, .lang-swap-soft, .shimmer-loop, .dots-drift, .wave-flow, .kenburns, .bloom-in { animation: none; }
   .shimmer-once { background-position: 0 0; }
 }

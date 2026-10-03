@@ -10,7 +10,6 @@ function useScrollOnNavigate() {
   useEffect(() => {
     const samePage = prevPath.current === location.pathname;
     prevPath.current = location.pathname;
-    if (location.search.includes('motivo=')) return; // la pagina Contatti porta da sola al modulo
     const behavior = samePage ? 'smooth' : 'auto';
     requestAnimationFrame(() => {
       if (location.hash) {

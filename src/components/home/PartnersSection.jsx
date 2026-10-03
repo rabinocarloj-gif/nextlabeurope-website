@@ -16,7 +16,14 @@ export default function PartnersSection({ lang }) {
           style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.14) 0%, rgba(74,144,226,0) 70%)' }} />
         <div className="aurora absolute -bottom-48 right-[5%] w-[560px] h-[560px] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(26,79,196,0.10) 0%, rgba(26,79,196,0) 70%)', animationDelay: '-9s' }} />
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(26,79,196,0.10) 1px, transparent 1px)', backgroundSize: '26px 26px', maskImage: 'radial-gradient(ellipse at center, #000 30%, transparent 75%)', WebkitMaskImage: 'radial-gradient(ellipse at center, #000 30%, transparent 75%)' }} />
+        <div className="absolute left-0 right-0 bottom-[12%] h-40 opacity-60">
+          <svg className="wave-flow h-full" style={{ width: '200%' }} viewBox="0 0 2400 160" preserveAspectRatio="none">
+            <path d="M0 80 C 200 20, 400 140, 600 80 S 1000 20, 1200 80 S 1600 140, 1800 80 S 2200 20, 2400 80" fill="none" stroke="rgba(26,79,196,0.14)" strokeWidth="1.2" />
+            <path d="M0 100 C 200 50, 400 150, 600 100 S 1000 50, 1200 100 S 1600 150, 1800 100 S 2200 50, 2400 100" fill="none" stroke="rgba(74,144,226,0.12)" strokeWidth="1" />
+            <path d="M0 60 C 200 110, 400 10, 600 60 S 1000 110, 1200 60 S 1600 10, 1800 60 S 2200 110, 2400 60" fill="none" stroke="rgba(242,201,76,0.16)" strokeWidth="1" />
+          </svg>
+        </div>
+        <div className="dots-drift absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(26,79,196,0.12) 1px, transparent 1px)', backgroundSize: '26px 26px', maskImage: 'radial-gradient(ellipse at center, #000 30%, transparent 75%)', WebkitMaskImage: 'radial-gradient(ellipse at center, #000 30%, transparent 75%)' }} />
       </div>
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}

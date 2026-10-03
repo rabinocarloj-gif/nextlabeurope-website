@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -35,8 +35,21 @@ export default function Navbar({ lang, setLang }) {
     return () => observer.disconnect();
   }, [location.pathname]);
 
+  const logoRef = useRef(null);
   const goHome = () => {
     setMobileOpen(false);
+    const el = logoRef.current;
+    if (el && el.animate && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.animate(
+        [
+          { transform: 'scale(1) rotate(0deg)', filter: 'drop-shadow(0 0 0 rgba(74,144,226,0))' },
+          { transform: 'scale(0.86) rotate(-6deg)', filter: 'drop-shadow(0 0 6px rgba(74,144,226,0.6))', offset: 0.3 },
+          { transform: 'scale(1.08) rotate(3deg)', filter: 'drop-shadow(0 0 14px rgba(74,144,226,0.55))', offset: 0.65 },
+          { transform: 'scale(1) rotate(0deg)', filter: 'drop-shadow(0 0 0 rgba(74,144,226,0))' },
+        ],
+        { duration: 750, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+      );
+    }
     if (location.pathname === '/') window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -64,9 +77,9 @@ export default function Navbar({ lang, setLang }) {
               pointerEvents: footerLogoVisible ? 'none' : 'auto',
               transition: 'opacity 900ms cubic-bezier(0.22, 1, 0.36, 1), transform 900ms cubic-bezier(0.22, 1, 0.36, 1), filter 900ms cubic-bezier(0.22, 1, 0.36, 1)',
             }}>
-            <img src={LOGO_URL} alt="Next Lab Europe" className="h-[68px] w-auto object-contain" />
+            <img ref={logoRef} src={LOGO_URL} alt="Next Lab Europe" className="h-[68px] w-auto object-contain transition-transform duration-300 hover:scale-[1.04]" />
           </Link>
-          <div className="hidden md:flex items-center gap-10">
+          <div key={lang} className="lang-swap-soft hidden md:flex items-center gap-10">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
@@ -81,16 +94,16 @@ export default function Navbar({ lang, setLang }) {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setLang(lang === 'it' ? 'en' : 'it')}
-              className="relative flex items-center w-16 h-8 rounded-full bg-gray-100 border border-gray-200 overflow-hidden"
+              className="relative flex items-center w-16 h-8 rounded-full bg-gray-100 border border-gray-200 overflow-hidden transition-shadow duration-300 hover:shadow-[0_0_0_4px_rgba(74,144,226,0.12)]"
             >
               <motion.div
-                className="absolute top-0.5 w-7 h-7 rounded-full bg-primary"
+                className="absolute top-[1px] w-7 h-7 rounded-full bg-primary"
                 style={{ backgroundColor: '#1a4fc4' }}
-                animate={{ left: lang === 'it' ? '2px' : '30px' }}
-                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                animate={{ left: lang === 'it' ? '1px' : '33px' }}
+                transition={{ type: 'spring', stiffness: 260, damping: 26 }}
               />
-              <span className={`relative z-10 flex-1 text-center font-mono text-[10px] font-semibold ${lang === 'it' ? 'text-white' : 'text-gray-500'}`}>IT</span>
-              <span className={`relative z-10 flex-1 text-center font-mono text-[10px] font-semibold ${lang === 'en' ? 'text-white' : 'text-gray-500'}`}>EN</span>
+              <span className={`relative z-10 flex-1 text-center font-mono text-[10px] font-semibold ${lang === 'it' ? 'text-white' : 'text-gray-500'} transition-colors duration-500`}>IT</span>
+              <span className={`relative z-10 flex-1 text-center font-mono text-[10px] font-semibold ${lang === 'en' ? 'text-white' : 'text-gray-500'} transition-colors duration-500`}>EN</span>
             </button>
             <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

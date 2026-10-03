@@ -7,8 +7,9 @@ const CONTACT_IMG = '/images/contatti.jpg';
 const translations = {
   it: {
     label: 'CONTATTI',
-    title: 'Entra in Next Lab Europe.',
-    subtitle: "Che tu voglia proporre un progetto, diventare partner o semplicemente conoscerci meglio — siamo qui.",
+    titleAccent: 'Unisciti',
+    title: ' a Next Lab Europe.',
+    subtitle: "Che tu voglia proporre un progetto, diventare partner o semplicemente conoscerci meglio: siamo qui per te.",
     formTitle: 'Scrivici',
     formIntro: 'Raccontaci chi sei e cosa ti interessa: ti risponderemo via email il prima possibile.',
     nameLabel: 'Nome e cognome',
@@ -34,8 +35,9 @@ const translations = {
   },
   en: {
     label: 'CONTACT',
-    title: 'Join Next Lab Europe.',
-    subtitle: "Whether you want to propose a project, become a partner, or simply get to know us better — we're here.",
+    titleAccent: 'Join',
+    title: ' Next Lab Europe.',
+    subtitle: "Whether you want to propose a project, become a partner, or simply get to know us better: we're here for you.",
     formTitle: 'Write to us',
     formIntro: "Tell us who you are and what you're interested in: we'll reply by email as soon as possible.",
     nameLabel: 'Full name',
@@ -74,7 +76,6 @@ export default function Contatti() {
   const messageRef = useRef(null);
 
   useEffect(() => {
-    if (params.get('motivo')) formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [params]);
 
   const update = (field) => (e) => {
@@ -126,8 +127,17 @@ export default function Contatti() {
     <>
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0">
-          <div aria-hidden="true" className="w-full h-full" style={{ backgroundImage: `url(${CONTACT_IMG})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          <div aria-hidden="true" className="kenburns w-full h-full" style={{ backgroundImage: `url(${CONTACT_IMG})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(252,252,252,0.95), rgba(252,252,252,0.9), rgba(252,252,252,1))' }} />
+          <svg aria-hidden="true" viewBox="0 0 400 400" className="bloom-in absolute -top-24 -right-24 w-[520px] h-[520px] opacity-70" style={{ animationDelay: '0.2s' }}>
+            {Array.from({ length: 12 }, (_, i) => {
+              const a = (i / 12) * Math.PI * 2 - Math.PI / 2; const cx = 200 + Math.cos(a) * 150, cy = 200 + Math.sin(a) * 150;
+              const pts = Array.from({ length: 10 }, (_, j) => { const r = j % 2 === 0 ? 9 : 3.8; const b = (j / 10) * Math.PI * 2 - Math.PI / 2; return `${(cx + Math.cos(b) * r).toFixed(1)},${(cy + Math.sin(b) * r).toFixed(1)}`; }).join(' ');
+              return <polygon key={i} className="eu-star" points={pts} fill="#4a90e2" style={{ opacity: 0.35, animationDelay: `${i * 0.5}s` }} />;
+            })}
+            <circle cx="200" cy="200" r="150" fill="none" stroke="rgba(26,79,196,0.12)" strokeDasharray="2 6" />
+          </svg>
+          <div aria-hidden="true" className="bloom-in absolute inset-0" style={{ background: 'radial-gradient(120% 80% at 85% 0%, rgba(74,144,226,0.14) 0%, rgba(74,144,226,0) 55%)' }} />
           <div aria-hidden="true" className="aurora absolute -top-32 right-[8%] w-[560px] h-[560px] rounded-full"
             style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.18) 0%, rgba(74,144,226,0) 70%)' }} />
           <div aria-hidden="true" className="aurora absolute top-24 right-[30%] w-[380px] h-[380px] rounded-full"
@@ -141,7 +151,7 @@ export default function Contatti() {
           <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="font-heading font-extrabold leading-[0.95] tracking-tight mb-6"
             style={{ fontSize: 'clamp(2.5rem, 6.5vw, 5.75rem)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            {t.title}
+            <span className="shimmer-loop" style={{ paddingRight: '0.06em', paddingBottom: '0.08em' }}>{t.titleAccent}</span>{t.title}
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="text-lg leading-relaxed max-w-xl" style={{ color: '#6b7280' }}>
@@ -259,18 +269,26 @@ export default function Contatti() {
                       {lang === 'it' ? 'Sede' : 'Location'}
                     </strong>
                     <p>{lang === 'it'
-                      ? 'Piazza Baracca 10, c/o Fondazione del Monte di Bologna e Ravenna, Scala A, Piano Secondo, 48022 Lugo (RA)'
-                      : 'Piazza Baracca 10, c/o Fondazione del Monte di Bologna e Ravenna, Staircase A, Second Floor, 48022 Lugo (RA), Italy'}</p>
+                      ? 'Piazza Baracca 10, Scala A, Piano Secondo, 48022 Lugo (RA)'
+                      : 'Piazza Baracca 10, Staircase A, Second Floor, 48022 Lugo (RA), Italy'}</p>
                   </div>
                 </div>
               </div>
               <div className="card-glow group relative p-8 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-1"
                 style={{ background: 'linear-gradient(145deg, #eff4ff 0%, #f8faff 60%, #ffffff 100%)', border: '1px solid rgba(26,79,196,0.14)', boxShadow: '0 20px 40px -28px rgba(26,79,196,0.45)' }}>
-                <div aria-hidden="true" className="absolute -right-10 -bottom-10 w-44 h-44 opacity-[0.08] transition-transform duration-[1400ms] group-hover:rotate-45">
-                  <svg viewBox="0 0 100 100" fill="#1a4fc4">
-                    {Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * Math.PI * 2; return <circle key={i} cx={50 + Math.cos(a) * 38} cy={50 + Math.sin(a) * 38} r="4" />; })}
-                  </svg>
-                </div>
+                <svg aria-hidden="true" viewBox="0 0 200 140" className="absolute right-4 bottom-2 w-48 h-36 pointer-events-none" fill="none">
+                  <path d="M188 18 C 150 10, 108 26, 92 62 C 80 90, 60 108, 22 112" pathLength="1"
+                    className="[stroke-dashoffset:0.35] transition-[stroke-dashoffset] duration-[1400ms] ease-out group-hover:[stroke-dashoffset:0]"
+                    stroke="url(#joinArrow)" strokeWidth="2.2" strokeLinecap="round" strokeDasharray="1" />
+                  <path d="M38 100 L 20 112 L 38 124" stroke="#1a4fc4" strokeOpacity="0.55" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+                    className="transition-transform duration-700 group-hover:-translate-x-1" />
+                  <defs>
+                    <linearGradient id="joinArrow" x1="1" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#4a90e2" stopOpacity="0" />
+                      <stop offset="100%" stopColor="#1a4fc4" stopOpacity="0.55" />
+                    </linearGradient>
+                  </defs>
+                </svg>
                 <div className="relative">
                 <h3 className="font-heading font-bold text-xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t.joinTitle}</h3>
                 <p className="text-sm leading-relaxed mb-5" style={{ color: '#6b7280' }}>{t.joinDesc}</p>

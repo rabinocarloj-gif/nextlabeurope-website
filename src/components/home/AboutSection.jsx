@@ -30,17 +30,24 @@ const team = [
 
 // Icone a linea dei tre pilastri
 const PILLAR_ICONS = [
-  // Imprenditoria: razzo/crescita
-  <path key="a" d="M4 16l5-5 4 4 7-7M14 8h6v6" />,
+  // Imprenditoria: crescita
+  <path key="a" d="M4 16l5-5 4 4 7-7M14 8h6v6" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />,
   // Formazione: libro aperto
-  <path key="b" d="M3 6.5C5.5 5 8.5 5 12 7c3.5-2 6.5-2 9-.5V19c-2.5-1.5-5.5-1.5-9 .5-3.5-2-6.5-2-9-.5zM12 7v12.5" />,
-  // Valori europei: stella
-  <path key="c" d="M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.8L12 16.9l-5.25 2.7 1-5.8L3.5 9.7l5.9-.9z" />,
+  <path key="b" d="M3 6.5C5.5 5 8.5 5 12 7c3.5-2 6.5-2 9-.5V19c-2.5-1.5-5.5-1.5-9 .5-3.5-2-6.5-2-9-.5zM12 7v12.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />,
+  // Valori europei: cerchio di 12 stelle della bandiera europea
+  <g key="c" fill="currentColor">
+    {Array.from({ length: 12 }, (_, k) => {
+      const ang = (k / 12) * Math.PI * 2 - Math.PI / 2;
+      const cx = 12 + Math.cos(ang) * 8, cy = 12 + Math.sin(ang) * 8;
+      const pts = Array.from({ length: 10 }, (_, j) => {
+        const r = j % 2 === 0 ? 1.95 : 0.85; const a2 = (j / 10) * Math.PI * 2 - Math.PI / 2;
+        return `${(cx + Math.cos(a2) * r).toFixed(2)},${(cy + Math.sin(a2) * r).toFixed(2)}`;
+      }).join(' ');
+      return <polygon key={k} points={pts} />;
+    })}
+  </g>,
 ];
 
-function initials(name) {
-  return name.split(' ').filter(Boolean).map((w) => w[0]).slice(0, 2).join('');
-}
 
 const translations = {
   it: {
@@ -108,16 +115,16 @@ export default function AboutSection({ lang, aboutImage }) {
               <motion.div key={pillar.num} initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.15 }}
                 className="relative group py-9 first:pt-0 flex gap-6 items-start" style={{ borderBottom: '1px solid #ececf1' }}>
-                <div className="relative shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:-translate-y-1"
+                <div className="relative shrink-0 w-14 h-14 mt-[14px] rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:-translate-y-1"
                   style={{ background: 'linear-gradient(140deg, #eff4ff 0%, #ffffff 100%)', border: '1px solid rgba(26,79,196,0.14)', boxShadow: '0 10px 24px -14px rgba(26,79,196,0.45)' }}>
                   <span aria-hidden="true" className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                     style={{ background: 'linear-gradient(140deg, #1a4fc4 0%, #4a90e2 100%)' }} />
-                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
-                    className="relative transition-colors duration-500 stroke-[#1a4fc4] group-hover:stroke-white">
+                  <svg viewBox="0 0 24 24" width="26" height="26"
+                    className="relative transition-colors duration-500 text-[#1a4fc4] group-hover:text-white">
                     {PILLAR_ICONS[i]}
                   </svg>
                 </div>
-                <div className="relative z-10 pt-1">
+                <div className="relative z-10">
                   <p className="font-mono text-[10px] uppercase tracking-[0.4em] mb-2" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
                     {pillar.num} / {lang === 'it' ? 'Pilastro' : 'Pillar'}
                   </p>
@@ -154,15 +161,9 @@ export default function AboutSection({ lang, aboutImage }) {
                 style={{ border: '1px solid #ececf1', scrollSnapAlign: 'start', boxShadow: '0 1px 2px rgba(15,15,15,0.03)' }}>
                 <span aria-hidden="true" className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"
                   style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.18) 0%, rgba(74,144,226,0) 70%)' }} />
-                <div className="relative flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center font-heading font-bold text-white text-lg transition-transform duration-500 group-hover:scale-105"
-                    style={{ background: 'linear-gradient(140deg, #1a4fc4 0%, #4a90e2 100%)', boxShadow: '0 10px 22px -10px rgba(26,79,196,0.7)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                    {initials(person.name)}
-                  </div>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.3em] leading-relaxed" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
-                    {person.role[lang]}
-                  </p>
-                </div>
+                <p className="relative font-mono text-[10px] uppercase tracking-[0.35em] mb-5" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
+                  {person.role[lang]}
+                </p>
                 <h4 className="relative font-heading font-bold text-xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   {person.name}
                 </h4>
