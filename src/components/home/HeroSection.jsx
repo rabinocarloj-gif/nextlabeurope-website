@@ -39,8 +39,8 @@ function EuropeanRing({ sectionRef }) {
     let angle = 0, speed = 360 / 140, last = performance.now(), raf;
     const tick = (now) => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      const target = performance.now() < boostUntil.current ? 360 / 4 : 360 / 140;
-      speed += (target - speed) * Math.min(1, dt * 2.2);
+      const target = goldRef.current ? (performance.now() < boostUntil.current ? 360 / 4 : 0) : 360 / 140;
+      speed += (target - speed) * Math.min(1, dt * (target === 0 ? 1.4 : 2.2));
       angle = (angle + speed * dt) % 360;
       if (svgRef.current) svgRef.current.style.transform = `rotate(${angle}deg)`;
       raf = requestAnimationFrame(tick);
@@ -79,7 +79,7 @@ function EuropeanRing({ sectionRef }) {
   };
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div ref={wrapRef} className={`${gold ? 'is-gold ' : ''}eu-ring-wrap absolute top-16 -right-6 w-[300px] h-[300px] opacity-25 sm:opacity-40 sm:w-[440px] sm:h-[440px] sm:top-0 sm:-right-8 lg:opacity-90 lg:w-[620px] lg:h-[620px] lg:-top-6 lg:-right-10`}>
+      <div ref={wrapRef} className={`${gold ? 'is-gold ' : ''}eu-ring-wrap absolute top-16 -right-16 w-[300px] h-[300px] opacity-25 sm:opacity-40 sm:w-[440px] sm:h-[440px] sm:top-1/2 sm:-translate-y-1/2 sm:-right-20 lg:opacity-90 lg:w-[620px] lg:h-[620px] lg:-right-28`}>
         <div className="eu-glow absolute inset-[12%] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.20) 0%, rgba(26,79,196,0.10) 45%, rgba(26,79,196,0) 72%)', filter: 'blur(10px)' }} />
         <div className="eu-glow-gold absolute inset-[6%] rounded-full"
