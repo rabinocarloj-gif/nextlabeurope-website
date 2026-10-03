@@ -94,9 +94,13 @@ export default function AboutSection({ lang, aboutImage }) {
               <motion.div key={pillar.num} initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.15 }}
                 className="relative group py-10 first:pt-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
+                <motion.span aria-hidden="true" initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
+                  transition={{ duration: 1.1, delay: 0.25 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute left-0 bottom-[-1px] h-px w-full origin-left"
+                  style={{ background: 'linear-gradient(to right, #1a4fc4, rgba(74,144,226,0.4), rgba(74,144,226,0))' }} />
                 <div className="relative z-10">
                   <p className="font-mono text-[10px] uppercase tracking-[0.4em] mb-3" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
-                    {lang === 'it' ? 'Pilastro' : 'Pillar'}
+                    {pillar.num} / {lang === 'it' ? 'Pilastro' : 'Pillar'}
                   </p>
                   <h3 className="font-heading font-bold text-2xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{pillar.title}</h3>
                   <p className="leading-relaxed text-sm" style={{ color: '#6b7280' }}>{pillar.desc}</p>

@@ -32,3 +32,20 @@
   50% { transform: translateY(12px); opacity: 0.5; }
 }
 .animate-scroll-bounce { animation: scroll-bounce 2s ease-in-out infinite; }
+
+/* Anello di stelle europee nella home */
+@keyframes eu-ring-spin { to { transform: rotate(360deg); } }
+@keyframes eu-glow-breathe {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.06); }
+}
+@keyframes eu-star-twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+.eu-ring { animation: eu-ring-spin 140s linear infinite; transform-origin: 50% 50%; }
+.eu-glow { animation: eu-glow-breathe 9s ease-in-out infinite; }
+.eu-star { animation: eu-star-twinkle 6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: reduce) {
+  .eu-ring, .eu-glow, .eu-star { animation: none; }
+}
