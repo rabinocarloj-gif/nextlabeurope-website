@@ -21,7 +21,7 @@ const projects = [
       it: 'Esperienza Nautica per Diversamente Abili',
       en: 'Sailing Experience for People with Disabilities',
     },
-    tags: { it: ['Inclusione sociale', 'Sport', 'Mare'], en: ['Social inclusion', 'Sport', 'Sea'] },
+    tags: { it: ['Inclusione sociale', 'Sport'], en: ['Social inclusion', 'Sport'] },
     icon: 'sail',
     desc: {
       it: "Un progetto di inclusione sociale che offre a persone con disabilità l'opportunità di vivere un'esperienza nautica, in un contesto sicuro e accogliente. L'iniziativa favorisce l'inclusione, l'autonomia e il benessere dei partecipanti, promuovendo al tempo stesso una cultura del mare e dello sport accessibile a tutti.",

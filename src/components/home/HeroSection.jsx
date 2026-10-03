@@ -30,6 +30,7 @@ function EuropeanRing({ sectionRef }) {
   const svgRef = useRef(null);
   const [gold, setGold] = useState(false);
   const goldRef = useRef(false);
+  const boostUntil = useRef(0);
 
   // Rotazione gestita a mano: lenta di base, accelera dolcemente quando le stelle diventano dorate
   useEffect(() => {
@@ -38,7 +39,7 @@ function EuropeanRing({ sectionRef }) {
     let angle = 0, speed = 360 / 140, last = performance.now(), raf;
     const tick = (now) => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      const target = goldRef.current ? 360 / 5 : 360 / 140;
+      const target = performance.now() < boostUntil.current ? 360 / 4 : 360 / 140;
       speed += (target - speed) * Math.min(1, dt * 2.2);
       angle = (angle + speed * dt) % 360;
       if (svgRef.current) svgRef.current.style.transform = `rotate(${angle}deg)`;
@@ -55,7 +56,7 @@ function EuropeanRing({ sectionRef }) {
       const r = wrapRef.current?.getBoundingClientRect(); if (!r) return;
       const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
       const near = Math.hypot(e.clientX - cx, e.clientY - cy) < r.width * 0.62;
-      if (near !== goldRef.current) { goldRef.current = near; setGold(near); }
+      if (near !== goldRef.current) { goldRef.current = near; setGold(near); if (near) boostUntil.current = performance.now() + 2000; }
     };
     const onLeave = () => { goldRef.current = false; setGold(false); };
     section.addEventListener('mousemove', onMove);
@@ -78,7 +79,7 @@ function EuropeanRing({ sectionRef }) {
   };
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div ref={wrapRef} className={`${gold ? 'is-gold ' : ''}eu-ring-wrap absolute -top-16 -right-40 w-[360px] h-[360px] opacity-25 sm:opacity-40 sm:w-[480px] sm:h-[480px] sm:-right-32 lg:opacity-90 lg:w-[640px] lg:h-[640px] lg:-top-16 lg:-right-32`}>
+      <div ref={wrapRef} className={`${gold ? 'is-gold ' : ''}eu-ring-wrap absolute top-16 -right-6 w-[300px] h-[300px] opacity-25 sm:opacity-40 sm:w-[440px] sm:h-[440px] sm:top-0 sm:-right-8 lg:opacity-90 lg:w-[620px] lg:h-[620px] lg:-top-6 lg:-right-10`}>
         <div className="eu-glow absolute inset-[12%] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.20) 0%, rgba(26,79,196,0.10) 45%, rgba(26,79,196,0) 72%)', filter: 'blur(10px)' }} />
         <div className="eu-glow-gold absolute inset-[6%] rounded-full"

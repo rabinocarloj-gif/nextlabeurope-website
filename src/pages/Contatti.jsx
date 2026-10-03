@@ -127,9 +127,12 @@ export default function Contatti() {
     <>
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0">
-          <div aria-hidden="true" className="kenburns w-full h-full" style={{ backgroundImage: `url(${CONTACT_IMG})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          <div aria-hidden="true" className="kenburns-loop w-full h-full" style={{ backgroundImage: `url(${CONTACT_IMG})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(252,252,252,0.95), rgba(252,252,252,0.9), rgba(252,252,252,1))' }} />
           <div aria-hidden="true" className="bloom-in absolute inset-0" style={{ background: 'radial-gradient(120% 80% at 85% 0%, rgba(74,144,226,0.14) 0%, rgba(74,144,226,0) 55%)' }} />
+          <div aria-hidden="true" className="dots-drift absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(26,79,196,0.10) 1px, transparent 1px)', backgroundSize: '28px 28px', maskImage: 'linear-gradient(to bottom, #000 0%, transparent 85%)', WebkitMaskImage: 'linear-gradient(to bottom, #000 0%, transparent 85%)' }} />
+          <div aria-hidden="true" className="glide-x absolute -top-40 left-[30%] w-[700px] h-[700px] rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.20) 0%, rgba(74,144,226,0) 68%)' }} />
           <div aria-hidden="true" className="aurora absolute -top-32 right-[8%] w-[560px] h-[560px] rounded-full"
             style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.18) 0%, rgba(74,144,226,0) 70%)' }} />
           <div aria-hidden="true" className="aurora absolute top-24 right-[30%] w-[380px] h-[380px] rounded-full"
@@ -268,26 +271,6 @@ export default function Contatti() {
               </div>
               <div className="card-glow group relative p-8 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-1"
                 style={{ background: 'linear-gradient(145deg, #eff4ff 0%, #f8faff 60%, #ffffff 100%)', border: '1px solid rgba(26,79,196,0.14)', boxShadow: '0 20px 40px -28px rgba(26,79,196,0.45)' }}>
-                <svg aria-hidden="true" viewBox="0 0 200 140" className="absolute right-4 bottom-2 w-48 h-36 pointer-events-none" fill="none">
-                  <defs>
-                    <linearGradient id="joinArrow" x1="1" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#4a90e2" stopOpacity="0" />
-                      <stop offset="100%" stopColor="#1a4fc4" stopOpacity="0.45" />
-                    </linearGradient>
-                    <radialGradient id="joinDot">
-                      <stop offset="0%" stopColor="#ffffff" />
-                      <stop offset="45%" stopColor="#4a90e2" />
-                      <stop offset="100%" stopColor="#4a90e2" stopOpacity="0" />
-                    </radialGradient>
-                  </defs>
-                  <path d="M190 16 C 150 8, 110 28, 96 62 C 84 92, 62 110, 26 113" stroke="url(#joinArrow)" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 6" className="transition-opacity duration-500 opacity-70 group-hover:opacity-100" />
-                  <path d="M40 104 L 25 113 L 40 122" stroke="#1a4fc4" strokeOpacity="0.5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-                    className="transition-transform duration-500 group-hover:-translate-x-1.5" />
-                  <circle r="7" fill="url(#joinDot)">
-                    <animateMotion dur="3.4s" repeatCount="indefinite" path="M190 16 C 150 8, 110 28, 96 62 C 84 92, 62 110, 26 113" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.45 0 0.25 1" />
-                    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.82;1" dur="3.4s" repeatCount="indefinite" />
-                  </circle>
-                </svg>
                 <div className="relative">
                 <h3 className="font-heading font-bold text-xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t.joinTitle}</h3>
                 <p className="text-sm leading-relaxed mb-5" style={{ color: '#6b7280' }}>{t.joinDesc}</p>
