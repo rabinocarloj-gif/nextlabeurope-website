@@ -160,10 +160,6 @@ export default function Contatti() {
                   <div aria-hidden="true" className="absolute -top-24 -right-24 w-64 h-64 rounded-full"
                     style={{ background: 'radial-gradient(circle, rgba(26,79,196,0.14) 0%, rgba(26,79,196,0) 70%)' }} />
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center mb-6"
-                      style={{ backgroundColor: '#1a4fc4', boxShadow: '0 8px 20px -6px rgba(26,79,196,0.6)' }}>
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
-                    </div>
                     <p className="font-heading font-extrabold text-2xl leading-tight mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#0F1B3D' }}>{t.sentTitle}</p>
                     <p className="leading-relaxed mb-6" style={{ color: '#374151' }}>{t.sentText}</p>
                     <div className="h-px w-full mb-6" style={{ background: 'linear-gradient(to right, rgba(26,79,196,0.25), rgba(26,79,196,0))' }} />
@@ -172,9 +168,9 @@ export default function Contatti() {
                       <a href="mailto:info@nextlabeurope.eu" className="transition-opacity hover:opacity-70" style={{ color: '#1a4fc4' }}>info@nextlabeurope.eu</a>
                     </p>
                     <button type="button" onClick={() => setStatus('idle')}
-                      className="inline-flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
+                      className="text-sm transition-opacity hover:opacity-70"
                       style={{ color: '#1a4fc4', fontWeight: 400, textDecoration: 'none' }}>
-                      <span aria-hidden="true">←</span> {t.sendAnother}
+                      {t.sendAnother}
                     </button>
                   </div>
                 </motion.div>
