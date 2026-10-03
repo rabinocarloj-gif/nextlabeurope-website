@@ -9,7 +9,7 @@ const translations = {
     title1: 'Costruiamo il futuro',
     title2: "dell'Europa,",
     title3: 'insieme.',
-    subtitle: "Next Lab Europe è un'associazione di giovani leader che promuove imprenditoria, formazione e valori europei per costruire una nuova generazione di cittadini attivi.",
+    subtitle: "Next Lab Europe è un'associazione che promuove l'imprenditoria giovanile e lo sviluppo dei territori in una prospettiva europea, diffonde i valori dell'Unione e contribuisce a formare una nuova generazione di cittadini motivati e attivi.",
     cta1: 'Scopri di più',
     cta2: 'Unisciti a noi',
   },
@@ -18,7 +18,7 @@ const translations = {
     title1: 'Building the future',
     title2: 'of Europe,',
     title3: 'together.',
-    subtitle: 'Next Lab Europe is an association of young leaders promoting entrepreneurship, education, and European values to build a new generation of active citizens.',
+    subtitle: 'Next Lab Europe is an association that promotes youth entrepreneurship and local development from a European perspective, spreads the values of the Union and helps shape a new generation of motivated and active citizens.',
     cta1: 'Learn more',
     cta2: 'Join us',
   },
@@ -61,14 +61,9 @@ export default function HeroSection({ lang, heroImage }) {
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}
             className="mt-10 flex flex-wrap gap-4">
-            <button onClick={scrollToAbout}
-              className="px-8 py-4 font-heading font-bold text-sm tracking-wide rounded-full text-white transition-all duration-300 shadow-md"
-              style={{ backgroundColor: '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              {t.cta1}
-            </button>
             <Link to="/contatti?motivo=socio"
-              className="px-8 py-4 border-2 font-heading font-bold text-sm tracking-wide rounded-full transition-all duration-300"
-              style={{ borderColor: '#1a4fc4', color: '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              className="inline-block px-16 py-4 font-heading font-bold text-sm tracking-wide rounded-full text-white transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+              style={{ backgroundColor: '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {t.cta2}
             </Link>
           </motion.div>

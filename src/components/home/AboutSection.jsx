@@ -33,7 +33,7 @@ const translations = {
     label: '01 / CHI SIAMO',
     title: "Una nuova generazione per l'",
     titleAccent: 'Europa.',
-    description: "Next Lab Europe nasce dalla convinzione che il futuro dell'Europa si costruisce dal basso, investendo sui giovani che combinano spirito imprenditoriale, formazione continua e un profondo senso di appartenenza ai valori europei. È un progetto che abbiamo voluto fortemente perché crediamo che il talento, se accompagnato nel modo giusto, possa restare e crescere nei territori da cui parte, invece di doverli lasciare.",
+    description: "Next Lab Europe nasce dalla convinzione che il futuro dell'Europa si costruisca valorizzando le nuove generazioni: giovani che uniscono spirito imprenditoriale, formazione continua e un profondo senso di appartenenza ai valori europei. Il nostro obiettivo è far emergere questi talenti e accompagnarli nella loro crescita, perché possano restare e generare valore nei territori da cui partono, invece di doverli lasciare.",
     pillars: [
       { num: '01', title: 'Imprenditoria', desc: "Promuoviamo l'innovazione e lo spirito imprenditoriale come motore di cambiamento sociale ed economico." },
       { num: '02', title: 'Formazione', desc: "Investiamo nella crescita personale e professionale attraverso programmi educativi d'eccellenza." },
@@ -46,7 +46,7 @@ const translations = {
     label: '01 / ABOUT US',
     title: 'A new generation for ',
     titleAccent: 'Europe.',
-    description: "Next Lab Europe was born from the conviction that Europe's future is built from the ground up, by investing in young people who combine entrepreneurial spirit, continuous learning, and a deep sense of European values. It's a project we wanted strongly, because we believe that talent, if supported the right way, can stay and grow in the places it comes from, instead of having to leave them.",
+    description: "Next Lab Europe was born from the conviction that Europe's future is built by empowering new generations: young people who combine entrepreneurial spirit, continuous learning and a deep sense of belonging to European values. Our goal is to bring out these talents and support their growth, so that they can stay and create value in the places they come from, instead of having to leave them.",
     pillars: [
       { num: '01', title: 'Entrepreneurship', desc: 'We promote innovation and entrepreneurial spirit as engines of social and economic change.' },
       { num: '02', title: 'Education', desc: 'We invest in personal and professional growth through excellence-driven educational programs.' },
@@ -94,13 +94,9 @@ export default function AboutSection({ lang, aboutImage }) {
               <motion.div key={pillar.num} initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.15 }}
                 className="relative group py-10 first:pt-0" style={{ borderBottom: '1px solid #f3f4f6' }}>
-                <span className="absolute -right-2 top-1/2 -translate-y-1/2 font-heading font-extrabold leading-none select-none pointer-events-none transition-all duration-700"
-                  style={{ fontSize: '8rem', color: '#f3f4f6', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                  {pillar.num}
-                </span>
                 <div className="relative z-10">
                   <p className="font-mono text-[10px] uppercase tracking-[0.4em] mb-3" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
-                    {pillar.num} / {lang === 'it' ? 'Pilastro' : 'Pillar'}
+                    {lang === 'it' ? 'Pilastro' : 'Pillar'}
                   </p>
                   <h3 className="font-heading font-bold text-2xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{pillar.title}</h3>
                   <p className="leading-relaxed text-sm" style={{ color: '#6b7280' }}>{pillar.desc}</p>
@@ -123,14 +119,6 @@ export default function AboutSection({ lang, aboutImage }) {
                 {t.govTitle}
               </motion.h3>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => scrollByCard(-1)} aria-label="Previous"
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-                style={{ border: '1.5px solid #e5e7eb' }}>‹</button>
-              <button onClick={() => scrollByCard(1)} aria-label="Next"
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-                style={{ border: '1.5px solid #e5e7eb' }}>›</button>
-            </div>
           </div>
 
           <div ref={scrollerRef}
@@ -152,6 +140,14 @@ export default function AboutSection({ lang, aboutImage }) {
                 </p>
               </motion.div>
             ))}
+          </div>
+          <div className="flex justify-center gap-3 mt-8">
+            <button onClick={() => scrollByCard(-1)} aria-label="Previous"
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              style={{ border: '1.5px solid #e5e7eb' }}>‹</button>
+            <button onClick={() => scrollByCard(1)} aria-label="Next"
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              style={{ border: '1.5px solid #e5e7eb' }}>›</button>
           </div>
         </div>
       </div>
