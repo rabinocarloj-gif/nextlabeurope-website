@@ -13,6 +13,7 @@ const translations = {
 export default function Navbar({ lang, setLang }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [footerLogoVisible, setFooterLogoVisible] = useState(false);
   const location = useLocation();
   const t = translations[lang];
 
@@ -21,6 +22,23 @@ export default function Navbar({ lang, setLang }) {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Quando il logo del footer entra nello schermo, il logo dell'header svanisce dolcemente
+  useEffect(() => {
+    const target = document.getElementById('footer-logo');
+    if (!target || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setFooterLogoVisible(entry.isIntersecting),
+      { threshold: 0.25 }
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [location.pathname]);
+
+  const goHome = () => {
+    setMobileOpen(false);
+    if (location.pathname === '/') window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const navLinks = [
     { label: t.home, to: '/' },
@@ -47,7 +65,15 @@ export default function Navbar({ lang, setLang }) {
         scrolled ? 'bg-white/75 backdrop-blur-md border-b border-gray-100/70 shadow-sm' : 'bg-transparent'
       }`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-24">
-          <Link to="/" className="flex items-center shrink-0">
+          <Link to="/" onClick={goHome} aria-label="Home"
+            className="flex items-center shrink-0"
+            style={{
+              opacity: footerLogoVisible ? 0 : 1,
+              transform: footerLogoVisible ? 'translateY(-6px) scale(0.96)' : 'none',
+              filter: footerLogoVisible ? 'blur(2px)' : 'none',
+              pointerEvents: footerLogoVisible ? 'none' : 'auto',
+              transition: 'opacity 900ms cubic-bezier(0.22, 1, 0.36, 1), transform 900ms cubic-bezier(0.22, 1, 0.36, 1), filter 900ms cubic-bezier(0.22, 1, 0.36, 1)',
+            }}>
             <img src={LOGO_URL} alt="Next Lab Europe" className="h-[68px] w-auto object-contain" />
           </Link>
           <div className="hidden md:flex items-center gap-10">

@@ -40,7 +40,10 @@ export default function Footer({ lang }) {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
           <div className="space-y-6">
-            <img src={LOGO_URL} alt="Next Lab Europe" className="h-[92px] w-auto object-contain" />
+            <Link to="/" id="footer-logo" aria-label="Home" className="inline-block transition-opacity duration-300 hover:opacity-80"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              <img src={LOGO_URL} alt="Next Lab Europe" className="h-[92px] w-auto object-contain" />
+            </Link>
             <p className="text-sm leading-relaxed max-w-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.tagline}</p>
             <div className="text-sm leading-relaxed space-y-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
               <p className="font-semibold" style={{ color: 'rgba(255,255,255,0.6)' }}>{t.orgTitle}</p>
