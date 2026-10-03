@@ -66,7 +66,7 @@ export default function HeroSection({ lang, heroImage }) {
               style={{ backgroundColor: '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {t.cta1}
             </button>
-            <Link to="/contatti"
+            <Link to="/contatti?motivo=socio"
               className="px-8 py-4 border-2 font-heading font-bold text-sm tracking-wide rounded-full transition-all duration-300"
               style={{ borderColor: '#1a4fc4', color: '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {t.cta2}

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useOutletContext } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useOutletContext, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const CONTACT_IMG = '/images/contatti.jpg';
@@ -10,13 +10,21 @@ const translations = {
     title: 'Entra in Next Lab Europe.',
     subtitle: "Che tu voglia proporre un progetto, diventare partner o semplicemente conoscerci meglio — siamo qui.",
     formTitle: 'Scrivici',
-    namePlaceholder: 'Nome e Cognome',
-    emailPlaceholder: 'La tua email',
-    subjectLabel: 'Motivo del contatto',
-    subjects: ['Voglio unirmi a Next Lab Europe', 'Proposta di collaborazione', 'Informazioni sui programmi', 'Diventare partner', 'Altro'],
+    formIntro: 'Raccontaci chi sei e cosa ti interessa: ti risponderemo via email il prima possibile.',
+    nameLabel: 'Nome e cognome',
+    emailLabel: 'Email',
+    reasonLabel: 'Motivo del contatto',
+    reasons: [['socio', 'Diventare socio o volontario'], ['collaborazione', 'Collaborazioni e partnership'], ['altro', 'Altro']],
+    messageLabel: 'Messaggio',
     messagePlaceholder: 'Scrivi qui il tuo messaggio...',
+    messageHint: { socio: 'Raccontaci qualcosa di te: età, studi o lavoro, città e cosa ti piacerebbe fare con noi. Ti invieremo noi il modulo di adesione.', collaborazione: "Indicaci l'ente o l'organizzazione che rappresenti e l'idea di collaborazione.", altro: '' },
     submit: 'Invia messaggio',
-    sent: 'Messaggio inviato ✓',
+    sending: 'Invio in corso…',
+    sentTitle: 'Messaggio inviato, grazie!',
+    sentText: "Abbiamo ricevuto il tuo messaggio e ti risponderemo all'indirizzo email che hai indicato.",
+    sendAnother: 'Invia un altro messaggio',
+    errorText: "Non siamo riusciti a inviare il messaggio. Riprova tra poco oppure scrivici direttamente a",
+    errorFields: 'Controlla i campi evidenziati: nome, email valida e un messaggio di almeno 10 caratteri.',
     infoTitle: 'Dove siamo',
     email: 'info@nextlabeurope.eu',
     joinTitle: 'Vuoi far parte di Next Lab Europe?',
@@ -28,13 +36,21 @@ const translations = {
     title: 'Join Next Lab Europe.',
     subtitle: "Whether you want to propose a project, become a partner, or simply get to know us better — we're here.",
     formTitle: 'Write to us',
-    namePlaceholder: 'Full name',
-    emailPlaceholder: 'Your email',
-    subjectLabel: 'Reason for contact',
-    subjects: ['I want to join Next Lab Europe', 'Partnership proposal', 'Program information', 'Become a partner', 'Other'],
+    formIntro: "Tell us who you are and what you're interested in: we'll reply by email as soon as possible.",
+    nameLabel: 'Full name',
+    emailLabel: 'Email',
+    reasonLabel: 'Reason for contact',
+    reasons: [['socio', 'Become a member or volunteer'], ['collaborazione', 'Collaborations and partnerships'], ['altro', 'Other']],
+    messageLabel: 'Message',
     messagePlaceholder: 'Write your message here...',
+    messageHint: { socio: "Tell us a bit about yourself: age, studies or job, city and what you'd like to do with us. We'll send you the membership form.", collaborazione: 'Tell us which organisation you represent and your idea for a collaboration.', altro: '' },
     submit: 'Send message',
-    sent: 'Message sent ✓',
+    sending: 'Sending…',
+    sentTitle: 'Message sent, thank you!',
+    sentText: "We have received your message and will reply to the email address you provided.",
+    sendAnother: 'Send another message',
+    errorText: "We couldn't send your message. Please try again shortly or write to us directly at",
+    errorFields: 'Please check the highlighted fields: name, a valid email and a message of at least 10 characters.',
     infoTitle: 'Where we are',
     email: 'info@nextlabeurope.eu',
     joinTitle: 'Want to be part of Next Lab Europe?',
@@ -46,12 +62,63 @@ const translations = {
 export default function Contatti() {
   const { lang } = useOutletContext();
   const t = translations[lang];
-  const [sent, setSent] = useState(false);
+  const [params] = useSearchParams();
+  const initialReason = ['socio', 'collaborazione', 'altro'].includes(params.get('motivo')) ? params.get('motivo') : 'socio';
+  const [form, setForm] = useState({ name: '', email: '', reason: initialReason, message: '', website: '' });
+  const [status, setStatus] = useState('idle'); // idle | sending | sent | error | invalid
+  const [badFields, setBadFields] = useState([]);
+  const startedAt = useRef(Date.now());
+  const formRef = useRef(null);
+  const messageRef = useRef(null);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSent(true);
+  useEffect(() => {
+    if (params.get('motivo')) formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [params]);
+
+  const update = (field) => (e) => {
+    setForm((f) => ({ ...f, [field]: e.target.value }));
+    setBadFields((b) => b.filter((x) => x !== field));
   };
+
+  const chooseJoin = () => {
+    setForm((f) => ({ ...f, reason: 'socio' }));
+    setStatus((s) => (s === 'sent' ? 'idle' : s));
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => messageRef.current?.focus({ preventScroll: true }), 600);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus('sending');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, lang, startedAt: startedAt.current }),
+      });
+      const out = await res.json().catch(() => ({}));
+      if (res.ok && out.ok) {
+        setStatus('sent');
+        setForm({ name: '', email: '', reason: 'socio', message: '', website: '' });
+        startedAt.current = Date.now();
+      } else if (out.error === 'invalid') {
+        setBadFields(out.fields || []);
+        setStatus('invalid');
+      } else {
+        setStatus('error');
+      }
+    } catch {
+      setStatus('error');
+    }
+  };
+
+  const fieldStyle = (name) => ({
+    border: `1.5px solid ${badFields.includes(name) ? '#ef4444' : '#e5e7eb'}`,
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    backgroundColor: '#fff',
+  });
+  const labelCls = 'block font-mono text-[11px] uppercase tracking-[0.2em] mb-2';
+  const labelStyle = { color: '#6b7280', fontFamily: "'JetBrains Mono', monospace" };
 
   return (
     <>
@@ -81,32 +148,76 @@ export default function Contatti() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-32">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-              <h2 className="font-heading font-extrabold text-3xl mb-8" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t.formTitle}</h2>
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <input type="text" placeholder={t.namePlaceholder} required
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
-                  style={{ border: '1.5px solid #e5e7eb', fontFamily: "'Plus Jakarta Sans', sans-serif" }} />
-                <input type="email" placeholder={t.emailPlaceholder} required
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
-                  style={{ border: '1.5px solid #e5e7eb', fontFamily: "'Plus Jakarta Sans', sans-serif" }} />
-                <select className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                  style={{ border: '1.5px solid #e5e7eb', fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#6b7280' }}>
-                  {t.subjects.map(s => <option key={s}>{s}</option>)}
-                </select>
-                <textarea rows={5} placeholder={t.messagePlaceholder} required
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-vertical"
-                  style={{ border: '1.5px solid #e5e7eb', fontFamily: "'Plus Jakarta Sans', sans-serif" }} />
-                <button type="submit"
-                  className="w-full py-4 font-heading font-bold text-sm tracking-wide rounded-full text-white transition-all"
-                  style={{ backgroundColor: sent ? '#22c55e' : '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-                  disabled={sent}>
-                  {sent ? t.sent : t.submit}
+              <h2 ref={formRef} className="font-heading font-extrabold text-3xl mb-3 scroll-mt-32" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t.formTitle}</h2>
+              <p className="text-sm leading-relaxed mb-8" style={{ color: '#6b7280' }}>{t.formIntro}</p>
+              {status === 'sent' ? (
+                <div className="p-8 rounded-2xl" style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #bbf7d0' }} role="status">
+                  <p className="font-heading font-bold text-xl mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#166534' }}>✓ {t.sentTitle}</p>
+                  <p className="text-sm leading-relaxed mb-6" style={{ color: '#374151' }}>{t.sentText}</p>
+                  <button type="button" onClick={() => setStatus('idle')} className="text-sm font-bold underline" style={{ color: '#1a4fc4' }}>{t.sendAnother}</button>
+                </div>
+              ) : (
+              <form onSubmit={handleSubmit} className="space-y-5" noValidate={false}>
+                <div>
+                  <label htmlFor="cf-name" className={labelCls} style={labelStyle}>{t.nameLabel}</label>
+                  <input id="cf-name" type="text" autoComplete="name" required minLength={2} maxLength={120}
+                    value={form.name} onChange={update('name')}
+                    className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-blue-200"
+                    style={fieldStyle('name')} />
+                </div>
+                <div>
+                  <label htmlFor="cf-email" className={labelCls} style={labelStyle}>{t.emailLabel}</label>
+                  <input id="cf-email" type="email" autoComplete="email" required maxLength={200}
+                    value={form.email} onChange={update('email')}
+                    className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all focus:ring-2 focus:ring-blue-200"
+                    style={fieldStyle('email')} />
+                </div>
+                <div>
+                  <span className={labelCls} style={labelStyle}>{t.reasonLabel}</span>
+                  <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t.reasonLabel}>
+                    {t.reasons.map(([key, label]) => (
+                      <button key={key} type="button" role="radio" aria-checked={form.reason === key}
+                        onClick={() => setForm((f) => ({ ...f, reason: key }))}
+                        className="px-4 py-2 rounded-full text-sm transition-all"
+                        style={form.reason === key
+                          ? { backgroundColor: '#1a4fc4', color: '#fff', border: '1.5px solid #1a4fc4' }
+                          : { backgroundColor: '#fff', color: '#374151', border: '1.5px solid #e5e7eb' }}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="cf-message" className={labelCls} style={labelStyle}>{t.messageLabel}</label>
+                  {t.messageHint[form.reason] && (
+                    <p className="text-xs leading-relaxed mb-2" style={{ color: '#6b7280' }}>{t.messageHint[form.reason]}</p>
+                  )}
+                  <textarea id="cf-message" ref={messageRef} rows={6} required minLength={10} maxLength={5000}
+                    placeholder={t.messagePlaceholder} value={form.message} onChange={update('message')}
+                    className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-y transition-all focus:ring-2 focus:ring-blue-200"
+                    style={fieldStyle('message')} />
+                </div>
+                {/* Campo trappola per i bot: invisibile alle persone */}
+                <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, overflow: 'hidden' }}>
+                  <label>Website<input type="text" tabIndex={-1} autoComplete="off" value={form.website} onChange={update('website')} /></label>
+                </div>
+                {status === 'invalid' && <p className="text-sm" style={{ color: '#b91c1c' }} role="alert">{t.errorFields}</p>}
+                {status === 'error' && (
+                  <p className="text-sm" style={{ color: '#b91c1c' }} role="alert">
+                    {t.errorText} <a href="mailto:info@nextlabeurope.eu" className="underline font-semibold">info@nextlabeurope.eu</a>.
+                  </p>
+                )}
+                <button type="submit" disabled={status === 'sending'}
+                  className="w-full py-4 font-heading font-bold text-sm tracking-wide rounded-full text-white transition-all disabled:opacity-70"
+                  style={{ backgroundColor: '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  {status === 'sending' ? t.sending : t.submit}
                 </button>
                 <p className="text-xs leading-relaxed" style={{ color: '#6b7280' }}>
                   {lang === 'it' ? 'Inviando il modulo dichiari di aver letto l\'' : 'By sending this form you confirm you have read the '}
                   <Link to="/privacy" className="underline hover:text-black">{lang === 'it' ? 'informativa sulla privacy' : 'Privacy Policy'}</Link>.
                 </p>
               </form>
+              )}
             </motion.div>
 
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
@@ -116,7 +227,7 @@ export default function Contatti() {
                   <span className="text-xl" style={{ color: '#1a4fc4' }}>✉</span>
                   <div>
                     <strong className="block text-xs uppercase tracking-widest mb-1" style={{ color: '#9ca3af', fontFamily: "'JetBrains Mono', monospace" }}>Email</strong>
-                    <p>{t.email}</p>
+                    <a href={`mailto:${t.email}`} className="hover:underline">{t.email}</a>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -125,14 +236,14 @@ export default function Contatti() {
                     <strong className="block text-xs uppercase tracking-widest mb-1" style={{ color: '#9ca3af', fontFamily: "'JetBrains Mono', monospace" }}>
                       {lang === 'it' ? 'Sede' : 'Location'}
                     </strong>
-                    <p>Italia</p>
+                    <p>Lugo (RA), {lang === 'it' ? 'Italia' : 'Italy'}</p>
                   </div>
                 </div>
               </div>
               <div className="p-7 rounded-2xl" style={{ backgroundColor: '#eff4ff', borderLeft: '4px solid #1a4fc4' }}>
                 <h3 className="font-heading font-bold text-xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t.joinTitle}</h3>
                 <p className="text-sm leading-relaxed mb-5" style={{ color: '#6b7280' }}>{t.joinDesc}</p>
-                <button className="px-6 py-3 font-heading font-bold text-sm rounded-full text-white"
+                <button type="button" onClick={chooseJoin} className="px-6 py-3 font-heading font-bold text-sm rounded-full text-white"
                   style={{ backgroundColor: '#1a4fc4', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   {t.joinCta}
                 </button>

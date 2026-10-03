@@ -33,7 +33,7 @@ export default function PartnersSection({ lang }) {
         </div>
         <p className="text-center text-sm" style={{ color: '#6b7280' }}>
           {t.note}{' '}
-          <Link to="/contatti" className="font-semibold" style={{ color: '#1a4fc4' }}>{t.cta}</Link>
+          <Link to="/contatti?motivo=collaborazione" className="font-semibold" style={{ color: '#1a4fc4' }}>{t.cta}</Link>
         </p>
       </div>
     </section>
