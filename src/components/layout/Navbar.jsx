@@ -10,7 +10,7 @@ const translations = {
   en: { home: 'Home', about: 'About Us', programs: 'Projects', contact: 'Contact' },
 };
 
-export default function Navbar({ lang, setLang }) {
+export default function Navbar({ lang, targetLang, setLang, fadeStyle }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [footerLogoVisible, setFooterLogoVisible] = useState(false);
@@ -79,7 +79,7 @@ export default function Navbar({ lang, setLang }) {
             }}>
             <img ref={logoRef} src={LOGO_URL} alt="Next Lab Europe" className="h-[68px] w-auto object-contain transition-transform duration-300 hover:scale-[1.04]" />
           </Link>
-          <div key={lang} className="lang-swap-soft hidden md:flex items-center gap-10">
+          <div className="hidden md:flex items-center gap-10" style={fadeStyle}>
             {navLinks.map((link) => (
               <Link
                 key={link.label}
@@ -93,17 +93,17 @@ export default function Navbar({ lang, setLang }) {
           </div>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setLang(lang === 'it' ? 'en' : 'it')}
+              onClick={() => setLang(targetLang === 'it' ? 'en' : 'it')}
               className="relative flex items-center w-16 h-8 rounded-full bg-gray-100 border border-gray-200 overflow-hidden transition-shadow duration-300 hover:shadow-[0_0_0_4px_rgba(74,144,226,0.12)]"
             >
               <motion.div
                 className="absolute top-[1px] w-7 h-7 rounded-full bg-primary"
                 style={{ backgroundColor: '#1a4fc4' }}
-                animate={{ left: lang === 'it' ? '1px' : '33px' }}
+                animate={{ left: targetLang === 'it' ? '1px' : '33px' }}
                 transition={{ type: 'spring', stiffness: 260, damping: 26 }}
               />
-              <span className={`relative z-10 flex-1 text-center font-mono text-[10px] font-semibold ${lang === 'it' ? 'text-white' : 'text-gray-500'} transition-colors duration-500`}>IT</span>
-              <span className={`relative z-10 flex-1 text-center font-mono text-[10px] font-semibold ${lang === 'en' ? 'text-white' : 'text-gray-500'} transition-colors duration-500`}>EN</span>
+              <span className={`relative z-10 flex-1 text-center font-mono text-[10px] font-semibold ${targetLang === 'it' ? 'text-white' : 'text-gray-500'} transition-colors duration-500`}>IT</span>
+              <span className={`relative z-10 flex-1 text-center font-mono text-[10px] font-semibold ${targetLang === 'en' ? 'text-white' : 'text-gray-500'} transition-colors duration-500`}>EN</span>
             </button>
             <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
               {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -119,7 +119,7 @@ export default function Navbar({ lang, setLang }) {
             exit={{ opacity: 0, y: -20 }}
             className="fixed inset-0 z-40 bg-white pt-24 px-8"
           >
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6" style={fadeStyle}>
               {navLinks.map((link, i) => (
                 <motion.div key={link.label} initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}>
                   <Link

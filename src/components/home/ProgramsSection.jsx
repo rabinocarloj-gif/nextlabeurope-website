@@ -21,7 +21,7 @@ const projects = [
       it: 'Esperienza Nautica per Diversamente Abili',
       en: 'Sailing Experience for People with Disabilities',
     },
-    tags: { it: ['Inclusione sociale', 'Sport'], en: ['Social inclusion', 'Sport'] },
+    tags: { it: ['Inclusione sociale', 'Barca', 'Mare'], en: ['Social inclusion', 'Boat', 'Sea'] },
     icon: 'sail',
     desc: {
       it: "Un progetto di inclusione sociale che offre a persone con disabilità l'opportunità di vivere un'esperienza nautica, in un contesto sicuro e accogliente. L'iniziativa favorisce l'inclusione, l'autonomia e il benessere dei partecipanti, promuovendo al tempo stesso una cultura del mare e dello sport accessibile a tutti.",
@@ -34,16 +34,24 @@ const ICONS = {
   compass: (
     <g fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="32" cy="32" r="22" />
-      <circle cx="32" cy="32" r="2" fill="currentColor" />
-      <path d="M41 23l-5.5 12.5L23 41l5.5-12.5z" />
       <path d="M32 6v4M32 54v4M6 32h4M54 32h4" />
+      <g className="cmp-needle">
+        <path d="M41 23l-5.5 12.5L23 41l5.5-12.5z" />
+        <path d="M41 23l-12.5 5.5L32 32z" fill="currentColor" fillOpacity="0.25" />
+      </g>
+      <circle cx="32" cy="32" r="2" fill="currentColor" />
     </g>
   ),
   sail: (
     <g fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M31 10v32M31 12L15 40h16M33 16l14 24H33" />
-      <path d="M12 46h40l-5 7H17z" />
-      <path d="M8 58c4 0 4-2 8-2s4 2 8 2 4-2 8-2 4 2 8 2 4-2 8-2 4 2 8 2" />
+      <g className="boat-bob">
+        <path d="M31 10v32M31 12L15 40h16M33 16l14 24H33" />
+        <path d="M12 46h40l-5 7H17z" />
+      </g>
+      <clipPath id="seaClip"><rect x="4" y="52" width="56" height="10" /></clipPath>
+      <g clipPath="url(#seaClip)">
+        <path className="sea-flow" d="M-8 58c4 0 4-2 8-2s4 2 8 2 4-2 8-2 4 2 8 2 4-2 8-2 4 2 8 2 4-2 8-2 4 2 8 2 4-2 8-2 4 2 8 2" />
+      </g>
     </g>
   ),
 };

@@ -53,9 +53,6 @@ export default function Footer({ lang }) {
             </div>
           </div>
           <div className="space-y-6">
-            <h4 className="font-mono text-[10px] uppercase tracking-[0.3em]" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {lang === 'it' ? 'Navigazione' : 'Navigation'}
-            </h4>
             <div className="flex flex-col gap-3">
               <Link to="/" className="footer-link text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.nav.home}</Link>
               <Link to="/#chi-siamo" className="footer-link text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.nav.about}</Link>

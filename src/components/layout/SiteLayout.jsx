@@ -65,19 +65,39 @@ function useSeo(lang) {
 
 export default function SiteLayout() {
   const [lang, setLang] = useState('it');
+  const [targetLang, setTargetLang] = useState('it');
+  const [fading, setFading] = useState(false);
+  const timer = useRef(null);
   useScrollOnNavigate();
   useSeo(lang);
-  const swapRef = useRef(null);
-  const firstLang = useRef(true);
-  useEffect(() => {
-    if (firstLang.current) { firstLang.current = false; return; }
-    const el = swapRef.current; if (!el) return;
-    el.classList.remove('lang-swap'); void el.offsetWidth; el.classList.add('lang-swap');
-  }, [lang]);
+
+  // Cambio lingua in dissolvenza: il testo sfuma, cambia lingua, poi riappare con calma
+  const changeLang = (next) => {
+    if (next === targetLang) return;
+    setTargetLang(next);
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { setLang(next); return; }
+    setFading(true);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      setLang(next);
+      requestAnimationFrame(() => requestAnimationFrame(() => setFading(false)));
+    }, 520);
+  };
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  const fadeStyle = {
+    opacity: fading ? 0 : 1,
+    filter: fading ? 'blur(3px)' : 'blur(0px)',
+    transition: fading
+      ? 'opacity 500ms cubic-bezier(0.4, 0, 1, 1), filter 500ms ease'
+      : 'opacity 900ms cubic-bezier(0.16, 1, 0.3, 1), filter 900ms ease',
+  };
+
   return (
     <div className="min-h-screen bg-background lattice-line">
-      <Navbar lang={lang} setLang={setLang} />
-      <div ref={swapRef}>
+      <Navbar lang={lang} targetLang={targetLang} setLang={changeLang} fadeStyle={fadeStyle} />
+      <div style={fadeStyle}>
         <main><Outlet context={{ lang }} /></main>
         <Footer lang={lang} />
       </div>
