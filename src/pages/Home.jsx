@@ -6,8 +6,8 @@ import WhatWeDoSection from '../components/home/WhatWeDoSection';
 import ProgramsSection from '../components/home/ProgramsSection';
 import PartnersSection from '../components/home/PartnersSection';
 
-const HERO_IMG = 'https://media.base44.com/images/public/6a22d208947a03fa34e3238c/47aa69a3d_generated_f7d19376.png';
-const ABOUT_IMG = 'https://media.base44.com/images/public/6a22d208947a03fa34e3238c/f4c660419_generated_72439d0c.png';
+const HERO_IMG = '/images/home-sfondo.jpg';
+const ABOUT_IMG = '/images/chi-siamo.jpg';
 
 export default function Home() {
   const { lang } = useOutletContext();

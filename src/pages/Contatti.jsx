@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-const CONTACT_IMG = 'https://media.base44.com/images/public/6a22d208947a03fa34e3238c/8614fbdfe_generated_c9cdfb85.png';
+const CONTACT_IMG = '/images/contatti.jpg';
 
 const translations = {
   it: {
