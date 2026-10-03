@@ -8,21 +8,25 @@ const translations = {
   it: {
     tagline: "Costruiamo il futuro dell'Europa, insieme.",
     nav: { home: 'Home', about: 'Chi Siamo', programs: 'Progetti', contact: 'Contatti' },
-    legal: '© 2026 nextlab EUROPE APS — Associazione di Promozione Sociale. Tutti i diritti riservati.',
+    legal: '© 2026 Next Lab Europe APS — Associazione di Promozione Sociale. Tutti i diritti riservati.',
     orgTitle: 'NEXT LAB EUROPE APS',
     address: ['Piazza Baracca, 10', 'c/o Fondazione del Monte di Bologna e Ravenna', 'Scala A, Piano Secondo', '48022 Lugo (RA)'],
     phone: 'Cell. +39 335 5318353',
     cf: 'C.F. 92105040395',
+    runts: 'Repertorio RUNTS n. 178511',
+    email: 'info@nextlabeurope.eu',
     statuto: 'Statuto (PDF)',
   },
   en: {
     tagline: "Building Europe's future, together.",
     nav: { home: 'Home', about: 'About Us', programs: 'Projects', contact: 'Contact' },
-    legal: '© 2026 nextlab EUROPE APS — Social Promotion Association. All rights reserved.',
+    legal: '© 2026 Next Lab Europe APS — Social Promotion Association. All rights reserved.',
     orgTitle: 'NEXT LAB EUROPE APS',
     address: ['Piazza Baracca, 10', 'c/o Fondazione del Monte di Bologna e Ravenna', 'Scala A, Piano Secondo', '48022 Lugo (RA), Italy'],
     phone: 'Phone +39 335 5318353',
     cf: 'Tax code 92105040395',
+    runts: 'RUNTS registration no. 178511',
+    email: 'info@nextlabeurope.eu',
     statuto: 'Statute (PDF)',
   },
 };
@@ -36,13 +40,15 @@ export default function Footer({ lang }) {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
           <div className="space-y-6">
-            <img src={LOGO_URL} alt="nextlab EUROPE" className="h-16 w-auto object-contain" />
+            <img src={LOGO_URL} alt="Next Lab Europe" className="h-16 w-auto object-contain" />
             <p className="text-sm leading-relaxed max-w-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.tagline}</p>
             <div className="text-sm leading-relaxed space-y-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
               <p className="font-semibold" style={{ color: 'rgba(255,255,255,0.6)' }}>{t.orgTitle}</p>
               {t.address.map((line) => <p key={line}>{line}</p>)}
               <p className="pt-1">{t.phone}</p>
               <p>{t.cf}</p>
+              <p>{t.runts}</p>
+              <p><a href={`mailto:${t.email}`} className="transition-colors hover:text-white">{t.email}</a></p>
             </div>
           </div>
           <div className="space-y-6">

@@ -33,27 +33,27 @@ const translations = {
     label: '01 / CHI SIAMO',
     title: "Una nuova generazione per l'",
     titleAccent: 'Europa.',
-    description: "nextlab EUROPE nasce dalla convinzione che il futuro dell'Europa si costruisce dal basso, investendo sui giovani che combinano spirito imprenditoriale, formazione continua e un profondo senso di appartenenza ai valori europei. È un progetto che abbiamo voluto fortemente perché crediamo che il talento, se accompagnato nel modo giusto, possa restare e crescere nei territori da cui parte, invece di doverli lasciare.",
+    description: "Next Lab Europe nasce dalla convinzione che il futuro dell'Europa si costruisce dal basso, investendo sui giovani che combinano spirito imprenditoriale, formazione continua e un profondo senso di appartenenza ai valori europei. È un progetto che abbiamo voluto fortemente perché crediamo che il talento, se accompagnato nel modo giusto, possa restare e crescere nei territori da cui parte, invece di doverli lasciare.",
     pillars: [
       { num: '01', title: 'Imprenditoria', desc: "Promuoviamo l'innovazione e lo spirito imprenditoriale come motore di cambiamento sociale ed economico." },
       { num: '02', title: 'Formazione', desc: "Investiamo nella crescita personale e professionale attraverso programmi educativi d'eccellenza." },
       { num: '03', title: 'Valori Europei', desc: 'Rafforziamo il senso di cittadinanza europea, la democrazia, e la cooperazione tra popoli.' },
     ],
     govLabel: 'IL DIRETTIVO',
-    govTitle: 'Chi guida nextlab EUROPE.',
+    govTitle: 'Chi guida Next Lab Europe.',
   },
   en: {
     label: '01 / ABOUT US',
     title: 'A new generation for ',
     titleAccent: 'Europe.',
-    description: "nextlab EUROPE was born from the conviction that Europe's future is built from the ground up, by investing in young people who combine entrepreneurial spirit, continuous learning, and a deep sense of European values. It's a project we wanted strongly, because we believe that talent, if supported the right way, can stay and grow in the places it comes from, instead of having to leave them.",
+    description: "Next Lab Europe was born from the conviction that Europe's future is built from the ground up, by investing in young people who combine entrepreneurial spirit, continuous learning, and a deep sense of European values. It's a project we wanted strongly, because we believe that talent, if supported the right way, can stay and grow in the places it comes from, instead of having to leave them.",
     pillars: [
       { num: '01', title: 'Entrepreneurship', desc: 'We promote innovation and entrepreneurial spirit as engines of social and economic change.' },
       { num: '02', title: 'Education', desc: 'We invest in personal and professional growth through excellence-driven educational programs.' },
       { num: '03', title: 'European Values', desc: 'We strengthen European citizenship, democracy, and cooperation among peoples.' },
     ],
     govLabel: 'THE BOARD',
-    govTitle: 'Who leads nextlab EUROPE.',
+    govTitle: 'Who leads Next Lab Europe.',
   },
 };
 

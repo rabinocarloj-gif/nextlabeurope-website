@@ -7,20 +7,20 @@ const LOGO_URL = "https://media.base44.com/images/public/6a22d208947a03fa34e3238
 
 const translations = {
   it: {
-    label: 'nextlab EUROPE APS',
+    label: 'Next Lab Europe APS',
     title1: 'Costruiamo il futuro',
     title2: "dell'Europa,",
     title3: 'insieme.',
-    subtitle: "nextlab EUROPE è un'associazione di giovani leader che promuove imprenditoria, formazione e valori europei per costruire una nuova generazione di cittadini attivi.",
+    subtitle: "Next Lab Europe è un'associazione di giovani leader che promuove imprenditoria, formazione e valori europei per costruire una nuova generazione di cittadini attivi.",
     cta1: 'Scopri di più',
     cta2: 'Unisciti a noi',
   },
   en: {
-    label: 'nextlab EUROPE APS',
+    label: 'Next Lab Europe APS',
     title1: 'Building the future',
     title2: 'of Europe,',
     title3: 'together.',
-    subtitle: 'nextlab EUROPE is an association of young leaders promoting entrepreneurship, education, and European values to build a new generation of active citizens.',
+    subtitle: 'Next Lab Europe is an association of young leaders promoting entrepreneurship, education, and European values to build a new generation of active citizens.',
     cta1: 'Learn more',
     cta2: 'Join us',
   },
@@ -39,7 +39,7 @@ export default function HeroSection({ lang, heroImage }) {
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-36 pb-20 w-full">
         <div className="max-w-4xl">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
-            <img src={LOGO_URL} alt="nextlab EUROPE" className="h-40 w-auto object-contain" />
+            <img src={LOGO_URL} alt="Next Lab Europe" className="h-40 w-auto object-contain" />
           </motion.div>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="font-mono text-[10px] uppercase tracking-[0.4em] mb-8" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
