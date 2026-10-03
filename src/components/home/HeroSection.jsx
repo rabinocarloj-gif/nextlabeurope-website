@@ -31,7 +31,7 @@ export default function HeroSection({ lang, heroImage }) {
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-white">
       <div className="absolute inset-0">
-        <img src={heroImage} alt="" className="w-full h-full object-cover opacity-10" />
+        <div aria-hidden="true" className="w-full h-full opacity-10" style={{ backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0.4), rgba(255,255,255,0.8))' }} />
       </div>
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-20 w-full">

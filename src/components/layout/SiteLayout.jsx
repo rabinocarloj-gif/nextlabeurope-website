@@ -25,8 +25,8 @@ function useScrollOnNavigate() {
 // Titolo, descrizione e indirizzo canonico per ogni pagina (letti da Google)
 const SEO = {
   '/': {
-    it: ["Next Lab Europe APS – Giovani, imprenditorialità e valori europei | Lugo (RA)", "Next Lab Europe APS è un'associazione di promozione sociale di Lugo (RA) che promuove imprenditorialità giovanile, formazione e valori europei per una nuova generazione di cittadini attivi."],
-    en: ['Next Lab Europe APS – Youth, entrepreneurship and European values', 'Next Lab Europe APS is a social promotion association based in Lugo (Italy) promoting youth entrepreneurship, education and European values for a new generation of active citizens.'],
+    it: ["Next Lab Europe APS", "Next Lab Europe APS è un'associazione di promozione sociale di Lugo (RA) che promuove imprenditorialità giovanile, formazione e valori europei per una nuova generazione di cittadini attivi."],
+    en: ['Next Lab Europe APS', 'Next Lab Europe APS is a social promotion association based in Lugo (Italy) promoting youth entrepreneurship, education and European values for a new generation of active citizens.'],
   },
   '/contatti': {
     it: ['Contatti – Next Lab Europe APS', "Scrivi a Next Lab Europe APS per diventare socio o volontario, chiedere informazioni o proporre una collaborazione. Sede a Lugo (RA)."],
