@@ -47,17 +47,7 @@ export default function Navbar({ lang, setLang }) {
     { label: t.contact, to: '/contatti' },
   ];
 
-  const handleNavClick = (to) => {
-    setMobileOpen(false);
-    if (to.startsWith('/#')) {
-      const id = to.replace('/#', '');
-      if (location.pathname === '/') {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        window.location.href = to;
-      }
-    }
-  };
+  const handleNavClick = () => setMobileOpen(false);
 
   return (
     <>
@@ -80,8 +70,8 @@ export default function Navbar({ lang, setLang }) {
             {navLinks.map((link) => (
               <Link
                 key={link.label}
-                to={link.to.startsWith('/#') ? (location.pathname === '/' ? '#' : link.to) : link.to}
-                onClick={() => handleNavClick(link.to)}
+                to={link.to}
+                onClick={handleNavClick}
                 className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/60 hover:text-primary transition-colors duration-300"
                 style={{ color: '#0F0F0F99' }}
               >
@@ -121,8 +111,8 @@ export default function Navbar({ lang, setLang }) {
               {navLinks.map((link, i) => (
                 <motion.div key={link.label} initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}>
                   <Link
-                    to={link.to.startsWith('/#') ? '#' : link.to}
-                    onClick={() => handleNavClick(link.to)}
+                    to={link.to}
+                    onClick={handleNavClick}
                     className="font-heading text-4xl font-bold hover:text-primary transition-colors"
                     style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
                   >
