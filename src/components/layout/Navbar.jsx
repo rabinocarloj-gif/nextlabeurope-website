@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const LOGO_URL = "https://media.base44.com/images/public/6a22d208947a03fa34e3238c/9830c8abc_WhatsApp_Image_2026-04-19_at_184059-removebg-preview.png";
+const LOGO_URL = "/logo-next-lab-europe.png";
 
 const translations = {
   it: { home: 'Home', about: 'Chi Siamo', programs: 'Progetti', contact: 'Contatti' },
@@ -46,9 +46,9 @@ export default function Navbar({ lang, setLang }) {
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled ? 'bg-white/95 backdrop-blur-xl border-b border-gray-100 shadow-sm' : 'bg-transparent'
       }`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-20">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-24">
           <Link to="/" className="flex items-center shrink-0">
-            <img src={LOGO_URL} alt="Next Lab Europe" className="h-14 w-auto object-contain" />
+            <img src={LOGO_URL} alt="Next Lab Europe" className="h-20 w-auto object-contain" />
           </Link>
           <div className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => (

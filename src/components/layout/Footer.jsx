@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import LegalModal from './LegalModal';
 
-const LOGO_URL = "https://media.base44.com/images/public/6a22d208947a03fa34e3238c/9830c8abc_WhatsApp_Image_2026-04-19_at_184059-removebg-preview.png";
+const LOGO_URL = "/logo-next-lab-europe.png";
 
 const translations = {
   it: {

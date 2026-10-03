@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const LOGO_URL = "https://media.base44.com/images/public/6a22d208947a03fa34e3238c/9830c8abc_WhatsApp_Image_2026-04-19_at_184059-removebg-preview.png";
-
 const translations = {
   it: {
     label: 'Next Lab Europe APS',
@@ -31,18 +29,15 @@ export default function HeroSection({ lang, heroImage }) {
   const scrollToAbout = () => document.getElementById('chi-siamo')?.scrollIntoView({ behavior: 'smooth' });
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
+    <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-white">
       <div className="absolute inset-0">
         <img src={heroImage} alt="" className="w-full h-full object-cover opacity-10" />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0.4), rgba(255,255,255,0.8))' }} />
       </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-36 pb-20 w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 pt-32 pb-20 w-full">
         <div className="max-w-4xl">
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
-            <img src={LOGO_URL} alt="Next Lab Europe" className="h-40 w-auto object-contain" />
-          </motion.div>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="font-mono text-[10px] uppercase tracking-[0.4em] mb-8" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
+            className="font-mono text-[12px] uppercase tracking-[0.4em] mb-8" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
             {t.label}
           </motion.p>
           <div className="space-y-1">
