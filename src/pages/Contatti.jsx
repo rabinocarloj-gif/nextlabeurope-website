@@ -156,9 +156,9 @@ export default function Contatti() {
                 <motion.div role="status" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   className="relative overflow-hidden p-8 sm:p-10 rounded-3xl"
-                  style={{ background: 'linear-gradient(140deg, #eff4ff 0%, #f8faff 55%, #e6eeff 100%)', border: '1px solid rgba(26,79,196,0.18)', boxShadow: '0 20px 50px -24px rgba(26,79,196,0.35)' }}>
+                  style={{ background: 'linear-gradient(140deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.6) 60%, rgba(239,244,255,0.55) 100%)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid rgba(26,79,196,0.12)', boxShadow: '0 16px 40px -28px rgba(26,79,196,0.3)' }}>
                   <div aria-hidden="true" className="absolute -top-24 -right-24 w-64 h-64 rounded-full"
-                    style={{ background: 'radial-gradient(circle, rgba(26,79,196,0.14) 0%, rgba(26,79,196,0) 70%)' }} />
+                    style={{ background: 'radial-gradient(circle, rgba(26,79,196,0.06) 0%, rgba(26,79,196,0) 70%)' }} />
                   <div className="relative">
                     <p className="font-heading font-extrabold text-2xl leading-tight mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#0F1B3D' }}>{t.sentTitle}</p>
                     <p className="leading-relaxed mb-6" style={{ color: '#374151' }}>{t.sentText}</p>
