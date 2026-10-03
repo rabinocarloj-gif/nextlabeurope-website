@@ -71,10 +71,10 @@ export default function Navbar({ lang, targetLang, setLang, fadeStyle }) {
           <Link to="/" onClick={goHome} aria-label="Home"
             className="flex items-center shrink-0"
             style={{
-              opacity: footerLogoVisible ? 0 : 1,
-              transform: footerLogoVisible ? 'translateY(-6px) scale(0.96)' : 'none',
-              filter: footerLogoVisible ? 'blur(2px)' : 'none',
-              pointerEvents: footerLogoVisible ? 'none' : 'auto',
+              opacity: footerLogoVisible && !mobileOpen ? 0 : 1,
+              transform: footerLogoVisible && !mobileOpen ? 'translateY(-6px) scale(0.96)' : 'none',
+              filter: footerLogoVisible && !mobileOpen ? 'blur(2px)' : 'none',
+              pointerEvents: footerLogoVisible && !mobileOpen ? 'none' : 'auto',
               transition: 'opacity 900ms cubic-bezier(0.22, 1, 0.36, 1), transform 900ms cubic-bezier(0.22, 1, 0.36, 1), filter 900ms cubic-bezier(0.22, 1, 0.36, 1)',
             }}>
             <img ref={logoRef} src={LOGO_URL} alt="Next Lab Europe" className="h-[68px] w-auto object-contain transition-transform duration-300 hover:scale-[1.04]" />
@@ -127,23 +127,15 @@ export default function Navbar({ lang, targetLang, setLang, fadeStyle }) {
                 style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.18) 0%, rgba(74,144,226,0) 68%)' }} />
               <div className="glide-x-rev absolute -bottom-32 right-[5%] w-[420px] h-[420px] rounded-full"
                 style={{ background: 'radial-gradient(circle, rgba(26,79,196,0.12) 0%, rgba(26,79,196,0) 68%)' }} />
-              <svg viewBox="0 0 400 400" className="absolute -right-24 bottom-24 w-[300px] h-[300px] opacity-[0.12]">
-                {Array.from({ length: 12 }, (_, k) => {
-                  const ang = (k / 12) * Math.PI * 2 - Math.PI / 2; const cx = 200 + Math.cos(ang) * 150, cy = 200 + Math.sin(ang) * 150;
-                  const pts = Array.from({ length: 10 }, (_, j) => { const r = j % 2 === 0 ? 12 : 5; const b = (j / 10) * Math.PI * 2 - Math.PI / 2; return `${(cx + Math.cos(b) * r).toFixed(1)},${(cy + Math.sin(b) * r).toFixed(1)}`; }).join(' ');
-                  return <polygon key={k} points={pts} fill="#1a4fc4" />;
-                })}
-              </svg>
             </div>
 
-            <nav className="relative flex-1 flex flex-col justify-center px-8 pt-28" style={fadeStyle}>
+            <nav className="relative flex-1 flex flex-col justify-start px-8 pt-32" style={fadeStyle}>
               <p className="font-mono text-[10px] uppercase tracking-[0.4em] mb-6" style={{ color: '#9aa3b5', fontFamily: "'JetBrains Mono', monospace" }}>Menu</p>
               <div className="flex flex-col">
                 {navLinks.map((link, i) => (
                   <motion.div key={link.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.07, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                     style={{ borderBottom: '1px solid rgba(26,79,196,0.10)' }}>
-                    <Link to={link.to} onClick={handleNavClick} className="group flex items-baseline gap-4 py-3.5">
-                      <span className="font-mono text-[10px] tracking-[0.2em]" style={{ color: '#9aa3b5', fontFamily: "'JetBrains Mono', monospace" }}>0{i + 1}</span>
+                    <Link to={link.to} onClick={handleNavClick} className="group flex items-baseline py-3.5">
                       <span className="font-heading text-2xl font-bold transition-transform duration-300 group-active:translate-x-1"
                         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#1a4fc4' }}>
                         {link.label}
