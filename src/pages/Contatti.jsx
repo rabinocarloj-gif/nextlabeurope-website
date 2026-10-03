@@ -29,7 +29,7 @@ const translations = {
     infoTitle: 'Dove siamo',
     email: 'info@nextlabeurope.eu',
     joinTitle: 'Vuoi far parte di Next Lab Europe?',
-    joinDesc: 'Siamo alla ricerca di giovani motivati tra i 15 e i 30 anni che vogliano contribuire a costruire qualcosa di significativo per l\'Europa.',
+    joinDesc: "Siamo alla ricerca delle nuove generazioni: giovani motivati che vogliano contribuire a costruire qualcosa di significativo per l'Europa.",
     joinCta: 'Candidati ora',
   },
   en: {
@@ -56,7 +56,7 @@ const translations = {
     infoTitle: 'Where we are',
     email: 'info@nextlabeurope.eu',
     joinTitle: 'Want to be part of Next Lab Europe?',
-    joinDesc: 'We are looking for motivated young people between 15 and 30 who want to contribute to building something meaningful for Europe.',
+    joinDesc: 'We are looking for the new generations: motivated young people who want to contribute to building something meaningful for Europe.',
     joinCta: 'Apply now',
   },
 };
@@ -136,7 +136,7 @@ export default function Contatti() {
           </motion.p>
           <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="font-heading font-extrabold leading-[0.95] tracking-tight mb-6"
-            style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            style={{ fontSize: 'clamp(2.5rem, 6.5vw, 5.75rem)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             {t.title}
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
