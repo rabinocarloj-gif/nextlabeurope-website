@@ -20,9 +20,10 @@ const translations = {
     messageHint: { socio: 'Raccontaci qualcosa di te: età, studi o lavoro, città e cosa ti piacerebbe fare con noi. Ti invieremo noi il modulo di adesione.', collaborazione: "Indicaci l'ente o l'organizzazione che rappresenti e l'idea di collaborazione.", altro: '' },
     submit: 'Invia messaggio',
     sending: 'Invio in corso…',
-    sentTitle: 'Messaggio inviato, grazie!',
-    sentText: "Abbiamo ricevuto il tuo messaggio e ti risponderemo all'indirizzo email che hai indicato.",
-    sendAnother: 'Invia un altro messaggio',
+    sentTitle: 'Ti ringraziamo per il tuo messaggio',
+    sentText: 'Risponderemo alla tua email il prima possibile.',
+    sentMore: "Per ulteriori informazioni, contattaci all'email:",
+    sendAnother: 'Nuovo messaggio',
     errorText: "Non siamo riusciti a inviare il messaggio. Riprova tra poco oppure scrivici direttamente a",
     errorFields: 'Controlla i campi evidenziati: nome, email valida e un messaggio di almeno 10 caratteri.',
     infoTitle: 'Dove siamo',
@@ -46,9 +47,10 @@ const translations = {
     messageHint: { socio: "Tell us a bit about yourself: age, studies or job, city and what you'd like to do with us. We'll send you the membership form.", collaborazione: 'Tell us which organisation you represent and your idea for a collaboration.', altro: '' },
     submit: 'Send message',
     sending: 'Sending…',
-    sentTitle: 'Message sent, thank you!',
-    sentText: "We have received your message and will reply to the email address you provided.",
-    sendAnother: 'Send another message',
+    sentTitle: 'Thank you for your message',
+    sentText: "We'll reply to your email as soon as possible.",
+    sentMore: 'For further information, contact us at:',
+    sendAnother: 'New message',
     errorText: "We couldn't send your message. Please try again shortly or write to us directly at",
     errorFields: 'Please check the highlighted fields: name, a valid email and a message of at least 10 characters.',
     infoTitle: 'Where we are',
@@ -151,11 +153,31 @@ export default function Contatti() {
               <h2 ref={formRef} className="font-heading font-extrabold text-3xl mb-3 scroll-mt-32" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t.formTitle}</h2>
               <p className="text-sm leading-relaxed mb-8" style={{ color: '#6b7280' }}>{t.formIntro}</p>
               {status === 'sent' ? (
-                <div className="p-8 rounded-2xl" style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #bbf7d0' }} role="status">
-                  <p className="font-heading font-bold text-xl mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#166534' }}>✓ {t.sentTitle}</p>
-                  <p className="text-sm leading-relaxed mb-6" style={{ color: '#374151' }}>{t.sentText}</p>
-                  <button type="button" onClick={() => setStatus('idle')} className="text-sm font-bold underline" style={{ color: '#1a4fc4' }}>{t.sendAnother}</button>
-                </div>
+                <motion.div role="status" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative overflow-hidden p-8 sm:p-10 rounded-3xl"
+                  style={{ background: 'linear-gradient(140deg, #eff4ff 0%, #f8faff 55%, #e6eeff 100%)', border: '1px solid rgba(26,79,196,0.18)', boxShadow: '0 20px 50px -24px rgba(26,79,196,0.35)' }}>
+                  <div aria-hidden="true" className="absolute -top-24 -right-24 w-64 h-64 rounded-full"
+                    style={{ background: 'radial-gradient(circle, rgba(26,79,196,0.14) 0%, rgba(26,79,196,0) 70%)' }} />
+                  <div className="relative">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center mb-6"
+                      style={{ backgroundColor: '#1a4fc4', boxShadow: '0 8px 20px -6px rgba(26,79,196,0.6)' }}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+                    </div>
+                    <p className="font-heading font-extrabold text-2xl leading-tight mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#0F1B3D' }}>{t.sentTitle}</p>
+                    <p className="leading-relaxed mb-6" style={{ color: '#374151' }}>{t.sentText}</p>
+                    <div className="h-px w-full mb-6" style={{ background: 'linear-gradient(to right, rgba(26,79,196,0.25), rgba(26,79,196,0))' }} />
+                    <p className="text-sm leading-relaxed mb-8" style={{ color: '#4b5563' }}>
+                      {t.sentMore}{' '}
+                      <a href="mailto:info@nextlabeurope.eu" className="transition-opacity hover:opacity-70" style={{ color: '#1a4fc4' }}>info@nextlabeurope.eu</a>
+                    </p>
+                    <button type="button" onClick={() => setStatus('idle')}
+                      className="inline-flex items-center gap-2 text-sm transition-opacity hover:opacity-70"
+                      style={{ color: '#1a4fc4', fontWeight: 400, textDecoration: 'none' }}>
+                      <span aria-hidden="true">←</span> {t.sendAnother}
+                    </button>
+                  </div>
+                </motion.div>
               ) : (
               <form onSubmit={handleSubmit} className="space-y-5" noValidate={false}>
                 <div>
