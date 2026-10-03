@@ -254,10 +254,9 @@ export default function Contatti() {
                     <strong className="block text-xs uppercase tracking-widest mb-1" style={{ color: '#9ca3af', fontFamily: "'JetBrains Mono', monospace" }}>
                       {lang === 'it' ? 'Sede' : 'Location'}
                     </strong>
-                    <p>Piazza Baracca, 10</p>
-                    <p className="text-sm" style={{ color: '#6b7280' }}>c/o Fondazione del Monte di Bologna e Ravenna</p>
-                    <p className="text-sm" style={{ color: '#6b7280' }}>{lang === 'it' ? 'Scala A, Piano Secondo' : 'Staircase A, Second Floor'}</p>
-                    <p>48022 Lugo (RA){lang === 'it' ? '' : ', Italy'}</p>
+                    <p>{lang === 'it'
+                      ? 'Piazza Baracca 10, c/o Fondazione del Monte di Bologna e Ravenna, Scala A, Piano Secondo, 48022 Lugo (RA)'
+                      : 'Piazza Baracca 10, c/o Fondazione del Monte di Bologna e Ravenna, Staircase A, Second Floor, 48022 Lugo (RA), Italy'}</p>
                   </div>
                 </div>
               </div>
