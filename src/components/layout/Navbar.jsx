@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import MenuBuddy from './MenuBuddy';
 
 const LOGO_URL = "/logo-next-lab-europe-simbolo.png";
 
@@ -36,6 +37,7 @@ export default function Navbar({ lang, targetLang, setLang, fadeStyle }) {
   }, [location.pathname]);
 
   const logoRef = useRef(null);
+  const menuRef = useRef(null);
   const goHome = () => {
     setMobileOpen(false);
     const el = logoRef.current;
@@ -118,9 +120,11 @@ export default function Navbar({ lang, targetLang, setLang, fadeStyle }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
+            ref={menuRef}
             className="fixed inset-0 z-40 overflow-hidden flex flex-col"
             style={{ backgroundColor: '#fcfcfc' }}
           >
+            <MenuBuddy containerRef={menuRef} />
             {/* luci in movimento sullo sfondo */}
             <div aria-hidden="true" className="pointer-events-none absolute inset-0">
               <div className="glide-x absolute -top-24 left-[10%] w-[420px] h-[420px] rounded-full"
@@ -134,7 +138,7 @@ export default function Navbar({ lang, targetLang, setLang, fadeStyle }) {
               <div className="flex flex-col">
                 {navLinks.map((link, i) => (
                   <motion.div key={link.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.07, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ borderBottom: '1px solid rgba(26,79,196,0.10)' }}>
+                    data-line style={{ borderBottom: '1px solid rgba(26,79,196,0.10)' }}>
                     <Link to={link.to} onClick={handleNavClick} className="group flex items-baseline py-3.5">
                       <span className="font-heading text-2xl font-bold transition-transform duration-300 group-active:translate-x-1"
                         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#1a4fc4' }}>
@@ -144,22 +148,12 @@ export default function Navbar({ lang, targetLang, setLang, fadeStyle }) {
                   </motion.div>
                 ))}
               </div>
-              <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.45 }}>
-                <Link to="/contatti?motivo=socio" onClick={handleNavClick}
-                  className="btn-glow mt-8 inline-block px-8 py-3.5 rounded-full text-white text-sm font-bold"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                  {lang === 'it' ? 'Unisciti a noi' : 'Join us'}
-                </Link>
-              </motion.div>
             </nav>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
               className="relative px-8 pb-10 pt-6 text-sm space-y-1.5" style={{ ...fadeStyle, color: '#6b7280', borderTop: '1px solid rgba(26,79,196,0.08)' }}>
               <a href="mailto:info@nextlabeurope.eu" className="block font-medium" style={{ color: '#1a4fc4' }}>info@nextlabeurope.eu</a>
               <p>Piazza Baracca 10, 48022 Lugo (RA)</p>
-              <p className="font-mono text-[10px] uppercase tracking-[0.3em] pt-2" style={{ color: '#9aa3b5', fontFamily: "'JetBrains Mono', monospace" }}>
-                Next Lab Europe APS · {lang === 'it' ? 'Associazione di Promozione Sociale' : 'Social Promotion Association'}
-              </p>
             </motion.div>
           </motion.div>
         )}
