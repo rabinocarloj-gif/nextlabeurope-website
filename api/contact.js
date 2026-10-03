@@ -10,6 +10,7 @@ import nodemailer from 'nodemailer';
 
 const REASONS = {
   socio: 'Diventare socio o volontario',
+  informazioni: 'Richiesta informazioni',
   collaborazione: 'Collaborazioni e partnership',
   altro: 'Altro',
 };

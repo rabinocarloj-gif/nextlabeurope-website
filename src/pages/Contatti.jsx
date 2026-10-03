@@ -14,10 +14,10 @@ const translations = {
     nameLabel: 'Nome e cognome',
     emailLabel: 'Email',
     reasonLabel: 'Motivo del contatto',
-    reasons: [['socio', 'Diventare socio o volontario'], ['collaborazione', 'Collaborazioni e partnership'], ['altro', 'Altro']],
+    reasons: [['socio', 'Diventare socio o volontario'], ['informazioni', 'Richiesta informazioni'], ['collaborazione', 'Collaborazioni e partnership'], ['altro', 'Altro']],
     messageLabel: 'Messaggio',
     messagePlaceholder: 'Scrivi qui il tuo messaggio...',
-    messageHint: { socio: 'Raccontaci qualcosa di te: età, studi o lavoro, città e cosa ti piacerebbe fare con noi. Ti invieremo noi il modulo di adesione.', collaborazione: "Indicaci l'ente o l'organizzazione che rappresenti e l'idea di collaborazione.", altro: '' },
+    messageHint: { socio: 'Raccontaci qualcosa di te: età, studi o lavoro, città e cosa ti piacerebbe fare con noi. Ti invieremo noi il modulo di adesione.', informazioni: 'Scrivici cosa vorresti sapere: le nostre attività, i progetti o le iniziative in corso.', collaborazione: "Indicaci l'ente o l'organizzazione che rappresenti e l'idea di collaborazione.", altro: '' },
     submit: 'Invia messaggio',
     sending: 'Invio in corso…',
     sentTitle: 'Ti ringraziamo per il tuo messaggio',
@@ -41,10 +41,10 @@ const translations = {
     nameLabel: 'Full name',
     emailLabel: 'Email',
     reasonLabel: 'Reason for contact',
-    reasons: [['socio', 'Become a member or volunteer'], ['collaborazione', 'Collaborations and partnerships'], ['altro', 'Other']],
+    reasons: [['socio', 'Become a member or volunteer'], ['informazioni', 'Request information'], ['collaborazione', 'Collaborations and partnerships'], ['altro', 'Other']],
     messageLabel: 'Message',
     messagePlaceholder: 'Write your message here...',
-    messageHint: { socio: "Tell us a bit about yourself: age, studies or job, city and what you'd like to do with us. We'll send you the membership form.", collaborazione: 'Tell us which organisation you represent and your idea for a collaboration.', altro: '' },
+    messageHint: { socio: "Tell us a bit about yourself: age, studies or job, city and what you'd like to do with us. We'll send you the membership form.", informazioni: 'Tell us what you would like to know: our activities, projects or current initiatives.', collaborazione: 'Tell us which organisation you represent and your idea for a collaboration.', altro: '' },
     submit: 'Send message',
     sending: 'Sending…',
     sentTitle: 'Thank you for your message',
@@ -65,7 +65,7 @@ export default function Contatti() {
   const { lang } = useOutletContext();
   const t = translations[lang];
   const [params] = useSearchParams();
-  const initialReason = ['socio', 'collaborazione', 'altro'].includes(params.get('motivo')) ? params.get('motivo') : 'socio';
+  const initialReason = ['socio', 'informazioni', 'collaborazione', 'altro'].includes(params.get('motivo')) ? params.get('motivo') : 'socio';
   const [form, setForm] = useState({ name: '', email: '', reason: initialReason, message: '', website: '' });
   const [status, setStatus] = useState('idle'); // idle | sending | sent | error | invalid
   const [badFields, setBadFields] = useState([]);
