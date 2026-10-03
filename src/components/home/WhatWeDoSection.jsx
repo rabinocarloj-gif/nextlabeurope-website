@@ -1,19 +1,15 @@
 import React, { useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Rocket, GraduationCap, Globe, BookOpen, UserRound, Brain, Lightbulb } from 'lucide-react';
 
 const ICON_STYLE = { color: '#1a4fc4' };
 const reduceMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Razzo: si carica, decolla con una grande fiamma e lascia una scia di fumo sullo schermo.
-// Succede una sola volta per caricamento di pagina.
+// Razzo: si carica e decolla dentro la casella, con tanto fuoco e fumo. Una sola volta per caricamento.
 let rocketLaunched = false;
 
 function RocketIcon({ trigger }) {
-  const ref = useRef(null);
-  const [phase, setPhase] = useState('idle'); // idle | charge | gone | back
-  const [flight, setFlight] = useState(null);
+  const [phase, setPhase] = useState('idle'); // idle | charge | fly | back
   const [ash, setAsh] = useState([]);
   const timers = useRef([]);
   React.useEffect(() => () => timers.current.forEach(clearTimeout), []);
@@ -23,126 +19,84 @@ function RocketIcon({ trigger }) {
     rocketLaunched = true;
     setPhase('charge');
     timers.current.push(setTimeout(() => {
-      const r = ref.current?.getBoundingClientRect();
-      if (r) setFlight({ x: r.left, y: r.top, w: r.width, h: r.height, id: Date.now() });
-      setAsh(Array.from({ length: 14 }, (_, i) => ({ id: `${Date.now()}-${i}`, left: 30 + Math.random() * 40, top: 50 + Math.random() * 25, dx: `${(Math.random() - 0.5) * 16}px`, delay: Math.random() * 0.5 })));
-      setPhase('gone');
+      setPhase('fly');
+      setAsh(Array.from({ length: 10 }, (_, i) => ({ id: `${Date.now()}-${i}`, left: 25 + Math.random() * 50, top: 60 + Math.random() * 25, dx: `${(Math.random() - 0.5) * 12}px`, delay: 0.5 + Math.random() * 0.8 })));
     }, 1100));
   }, [trigger]);
 
-  const onFlightDone = () => {
-    setFlight(null);
-    setPhase('back');
-    timers.current.push(setTimeout(() => { setAsh([]); setPhase('idle'); }, 800));
-  };
-
   return (
-    <span className="relative w-5 h-5 inline-flex">
-      <span ref={ref} className={`inline-flex ${phase === 'charge' ? 'rocket-charging' : ''} ${phase === 'back' ? 'rocket-return' : ''}`}
-        style={{ opacity: phase === 'gone' ? 0 : 1 }}>
+    <>
+      {phase === 'fly' && <BoxFlight onDone={() => { setPhase('back'); timers.current.push(setTimeout(() => { setAsh([]); setPhase('idle'); }, 900)); }} />}
+      <span className={`relative inline-flex ${phase === 'charge' ? 'rocket-charging' : ''} ${phase === 'back' ? 'rocket-return' : ''}`}
+        style={{ opacity: phase === 'fly' ? 0 : 1 }}>
         <Rocket className="w-5 h-5" style={ICON_STYLE} />
       </span>
       {ash.map((a) => (
         <span key={a.id} className="ash" style={{ left: `${a.left}%`, top: `${a.top}%`, '--dx': a.dx, animationDelay: `${a.delay}s` }} />
       ))}
-      {flight && createPortal(<RocketFlight key={flight.id} {...flight} onDone={onFlightDone} />, document.body)}
-    </span>
+    </>
   );
 }
 
-// Volo a schermo intero: razzo, fiamma grande e fumo disegnati su un canvas sopra la pagina
-function RocketFlight({ x, y, w, h, onDone }) {
+// Decollo dentro la casella: canvas con fiamma, fumo e razzo che esce dall'angolo
+function BoxFlight({ onDone }) {
   const canvasRef = useRef(null);
-  const rocketRef = useRef(null);
   React.useEffect(() => {
-    const canvas = canvasRef.current; const ctx = canvas.getContext('2d');
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const W = window.innerWidth, H = window.innerHeight;
-    canvas.width = W * dpr; canvas.height = H * dpr; ctx.scale(dpr, dpr);
-    const sx = x + w / 2, sy = y + h / 2;
-    const ex = W + 220, ey = -220;
-    const FLY = 1700, FADE = 2800;
-    const smoke = [];
-    const t0 = performance.now();
-    let last = t0, raf;
-    const ease = (t) => t * t * (3 - 2 * t) * 0.35 + t * t * t * 0.65;
-    const pos = (t) => {
-      const k = ease(Math.min(1, t));
-      // leggera curva verso l'alto
-      const cx = sx + (ex - sx) * k;
-      const cy = sy + (ey - sy) * k - Math.sin(k * Math.PI) * 60;
-      return [cx, cy];
-    };
+    const canvas = canvasRef.current; const box = canvas.parentElement;
+    const W = box.clientWidth, H = box.clientHeight;
+    const dpr = Math.min(3, window.devicePixelRatio || 1);
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+    const svg = new Image();
+    svg.src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#1a4fc4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>');
+    const sx = W / 2, sy = H / 2, ex = W + 18, ey = -18;
+    const FLY = 900, TOTAL = 3400;
+    const smoke = []; const sparks = [];
+    const t0 = performance.now(); let last = t0, raf;
     const frame = (now) => {
-      const el = now - t0; const dt = Math.min(0.05, (now - last) / 1000); last = now;
-      const t = el / FLY;
+      const el = now - t0, dt = Math.min(0.05, (now - last) / 1000); last = now;
       ctx.clearRect(0, 0, W, H);
-      const flying = t < 1;
-      let px = 0, py = 0, ang = -Math.PI / 4, scale = 1;
+      const t = Math.min(1, el / FLY), k = t * t;
+      const flying = el < FLY + 60;
+      const px = sx + (ex - sx) * k, py = sy + (ey - sy) * k;
+      const ang = -Math.PI / 4;
+      // tail position (rocket points up-right, tail down-left)
+      const tx = px - 8, ty = py + 8;
       if (flying) {
-        [px, py] = pos(t);
-        const [nx, ny] = pos(Math.min(1, t + 0.01));
-        ang = Math.atan2(ny - py, nx - px);
-        scale = 1 + Math.min(1, t) * 2.2;
-        // scia di fumo dalla coda
-        const tx = px - Math.cos(ang) * 14 * scale, ty = py - Math.sin(ang) * 14 * scale;
-        for (let i = 0; i < 4; i++) {
-          smoke.push({ x: tx + (Math.random() - 0.5) * 8, y: ty + (Math.random() - 0.5) * 8,
-            vx: -Math.cos(ang) * (20 + Math.random() * 40) + (Math.random() - 0.5) * 30,
-            vy: -Math.sin(ang) * (20 + Math.random() * 40) + (Math.random() - 0.5) * 30,
-            r: 8 + Math.random() * 8 * scale, grow: 34 + Math.random() * 40, life: 0, max: 1.8 + Math.random() * 1.4 });
-        }
+        for (let i = 0; i < 5; i++) smoke.push({ x: tx + (Math.random() - 0.5) * 4, y: ty + (Math.random() - 0.5) * 4, vx: -20 - Math.random() * 30, vy: 20 + Math.random() * 30, r: 2 + Math.random() * 3, grow: 14 + Math.random() * 14, life: 0, max: 1.4 + Math.random() * 1.4 });
+        for (let i = 0; i < 3; i++) sparks.push({ x: tx, y: ty, vx: -30 - Math.random() * 60 + (Math.random() - 0.5) * 30, vy: 30 + Math.random() * 60, life: 0, max: 0.25 + Math.random() * 0.3 });
       }
-      // fumo
       for (let i = smoke.length - 1; i >= 0; i--) {
-        const p = smoke[i]; p.life += dt;
-        if (p.life > p.max) { smoke.splice(i, 1); continue; }
-        p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.97; p.vy = p.vy * 0.97 - 6 * dt; p.r += p.grow * dt;
-        const k = p.life / p.max;
-        const a = 0.38 * (1 - k) * Math.min(1, p.life * 6);
+        const p = smoke[i]; p.life += dt; if (p.life > p.max) { smoke.splice(i, 1); continue; }
+        p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.94; p.vy = p.vy * 0.94 - 10 * dt; p.r += p.grow * dt;
+        const a = 0.55 * (1 - p.life / p.max);
         const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
-        g.addColorStop(0, `rgba(205,210,220,${a})`);
-        g.addColorStop(0.6, `rgba(185,192,205,${a * 0.6})`);
-        g.addColorStop(1, 'rgba(185,192,205,0)');
+        g.addColorStop(0, `rgba(170,178,192,${a})`); g.addColorStop(1, 'rgba(170,178,192,0)');
         ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
       }
-      // fiamma grande
-      if (flying) {
-        const fx = px - Math.cos(ang) * 12 * scale, fy = py - Math.sin(ang) * 12 * scale;
-        const flick = 0.85 + Math.random() * 0.3;
-        const len = 72 * scale * flick;
-        ctx.save(); ctx.translate(fx, fy); ctx.rotate(ang + Math.PI);
-        const fg = ctx.createRadialGradient(0, 0, 0, len * 0.35, 0, len);
-        fg.addColorStop(0, 'rgba(255,255,240,0.95)');
-        fg.addColorStop(0.2, 'rgba(255,225,120,0.9)');
-        fg.addColorStop(0.5, 'rgba(255,140,40,0.7)');
-        fg.addColorStop(1, 'rgba(255,80,20,0)');
-        ctx.fillStyle = fg; ctx.beginPath(); ctx.ellipse(len * 0.4, 0, len * 0.75, 13 * scale * flick, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-        const glow = ctx.createRadialGradient(fx, fy, 0, fx, fy, 40 * scale);
-        glow.addColorStop(0, 'rgba(255,190,90,0.35)'); glow.addColorStop(1, 'rgba(255,190,90,0)');
-        ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(fx, fy, 40 * scale, 0, Math.PI * 2); ctx.fill();
-        if (rocketRef.current) {
-          rocketRef.current.style.transform = `translate(${px - w / 2}px, ${py - h / 2}px) rotate(${ang + Math.PI / 4}rad) scale(${scale})`;
-          rocketRef.current.style.opacity = '1';
-        }
-      } else if (rocketRef.current) {
-        rocketRef.current.style.opacity = '0';
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const p = sparks[i]; p.life += dt; if (p.life > p.max) { sparks.splice(i, 1); continue; }
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        ctx.fillStyle = `rgba(255,${150 + Math.random() * 80 | 0},60,${1 - p.life / p.max})`; ctx.fillRect(p.x, p.y, 1.6, 1.6);
       }
-      if (el < FLY + FADE || smoke.length) raf = requestAnimationFrame(frame);
-      else onDone();
+      if (flying) {
+        const flick = 0.8 + Math.random() * 0.4, len = 22 * flick;
+        ctx.save(); ctx.translate(tx, ty); ctx.rotate(ang + Math.PI);
+        const fg = ctx.createRadialGradient(0, 0, 0, len * 0.3, 0, len);
+        fg.addColorStop(0, 'rgba(255,255,235,1)'); fg.addColorStop(0.25, 'rgba(255,220,110,0.95)'); fg.addColorStop(0.6, 'rgba(255,130,40,0.75)'); fg.addColorStop(1, 'rgba(255,70,20,0)');
+        ctx.fillStyle = fg; ctx.beginPath(); ctx.ellipse(len * 0.4, 0, len * 0.7, 5.5 * flick, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+        const glow = ctx.createRadialGradient(tx, ty, 0, tx, ty, 16);
+        glow.addColorStop(0, 'rgba(255,190,90,0.55)'); glow.addColorStop(1, 'rgba(255,190,90,0)');
+        ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(tx, ty, 16, 0, Math.PI * 2); ctx.fill();
+        if (svg.complete) ctx.drawImage(svg, px - 10, py - 10, 20, 20);
+      }
+      if (el < TOTAL || smoke.length) raf = requestAnimationFrame(frame); else onDone();
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
   }, []);
-  return (
-    <>
-      <canvas ref={canvasRef} aria-hidden="true" style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', zIndex: 60, pointerEvents: 'none' }} />
-      <span ref={rocketRef} aria-hidden="true" style={{ position: 'fixed', left: 0, top: 0, width: w, height: h, zIndex: 61, pointerEvents: 'none', opacity: 0, willChange: 'transform' }}>
-        <Rocket className="w-5 h-5" style={ICON_STYLE} />
-      </span>
-    </>
-  );
+  return <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 w-full h-full pointer-events-none" />;
 }
 
 // Formazione: cappello -> libro -> cervello -> idea luminosa -> di nuovo cappello
@@ -180,7 +134,7 @@ function MissionCard({ card, i }) {
       className="card-glow group bg-white p-10 rounded-2xl transition-all duration-500 cursor-default hover:-translate-y-1.5 hover:shadow-[0_24px_50px_-30px_rgba(26,79,196,0.4)]"
       style={{ border: '1px solid #f3f4f6' }}>
       <div className="mb-8">
-        <div className="relative w-12 h-12 flex items-center justify-center rounded-xl transition-all duration-300 group-hover:shadow-[0_8px_20px_-10px_rgba(26,79,196,0.6)]"
+        <div className="relative w-12 h-12 flex items-center justify-center rounded-xl overflow-hidden transition-all duration-300 group-hover:shadow-[0_8px_20px_-10px_rgba(26,79,196,0.6)]"
           style={{ backgroundColor: 'rgba(26,79,196,0.08)' }}>
           {card.kind === 'rocket' && <RocketIcon trigger={hovers} />}
           {card.kind === 'edu' && <CycleIcon step={hovers} steps={EDU_STEPS} />}

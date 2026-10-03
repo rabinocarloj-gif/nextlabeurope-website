@@ -114,25 +114,61 @@ export default function Navbar({ lang, targetLang, setLang, fadeStyle }) {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-white pt-24 px-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+            className="fixed inset-0 z-40 overflow-hidden flex flex-col"
+            style={{ backgroundColor: '#fcfcfc' }}
           >
-            <div className="flex flex-col gap-6" style={fadeStyle}>
-              {navLinks.map((link, i) => (
-                <motion.div key={link.label} initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}>
-                  <Link
-                    to={link.to}
-                    onClick={handleNavClick}
-                    className="font-heading text-2xl font-bold transition-opacity hover:opacity-70"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#1a4fc4' }}
-                  >
-                    {link.label}
-                  </Link>
-                </motion.div>
-              ))}
+            {/* luci in movimento sullo sfondo */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+              <div className="glide-x absolute -top-24 left-[10%] w-[420px] h-[420px] rounded-full"
+                style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.18) 0%, rgba(74,144,226,0) 68%)' }} />
+              <div className="glide-x-rev absolute -bottom-32 right-[5%] w-[420px] h-[420px] rounded-full"
+                style={{ background: 'radial-gradient(circle, rgba(26,79,196,0.12) 0%, rgba(26,79,196,0) 68%)' }} />
+              <svg viewBox="0 0 400 400" className="absolute -right-24 bottom-24 w-[300px] h-[300px] opacity-[0.12]">
+                {Array.from({ length: 12 }, (_, k) => {
+                  const ang = (k / 12) * Math.PI * 2 - Math.PI / 2; const cx = 200 + Math.cos(ang) * 150, cy = 200 + Math.sin(ang) * 150;
+                  const pts = Array.from({ length: 10 }, (_, j) => { const r = j % 2 === 0 ? 12 : 5; const b = (j / 10) * Math.PI * 2 - Math.PI / 2; return `${(cx + Math.cos(b) * r).toFixed(1)},${(cy + Math.sin(b) * r).toFixed(1)}`; }).join(' ');
+                  return <polygon key={k} points={pts} fill="#1a4fc4" />;
+                })}
+              </svg>
             </div>
+
+            <nav className="relative flex-1 flex flex-col justify-center px-8 pt-28" style={fadeStyle}>
+              <p className="font-mono text-[10px] uppercase tracking-[0.4em] mb-6" style={{ color: '#9aa3b5', fontFamily: "'JetBrains Mono', monospace" }}>Menu</p>
+              <div className="flex flex-col">
+                {navLinks.map((link, i) => (
+                  <motion.div key={link.label} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 + i * 0.07, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                    style={{ borderBottom: '1px solid rgba(26,79,196,0.10)' }}>
+                    <Link to={link.to} onClick={handleNavClick} className="group flex items-baseline gap-4 py-3.5">
+                      <span className="font-mono text-[10px] tracking-[0.2em]" style={{ color: '#9aa3b5', fontFamily: "'JetBrains Mono', monospace" }}>0{i + 1}</span>
+                      <span className="font-heading text-2xl font-bold transition-transform duration-300 group-active:translate-x-1"
+                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#1a4fc4' }}>
+                        {link.label}
+                      </span>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+              <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.45 }}>
+                <Link to="/contatti?motivo=socio" onClick={handleNavClick}
+                  className="btn-glow mt-8 inline-block px-8 py-3.5 rounded-full text-white text-sm font-bold"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  {lang === 'it' ? 'Unisciti a noi' : 'Join us'}
+                </Link>
+              </motion.div>
+            </nav>
+
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+              className="relative px-8 pb-10 pt-6 text-sm space-y-1.5" style={{ ...fadeStyle, color: '#6b7280', borderTop: '1px solid rgba(26,79,196,0.08)' }}>
+              <a href="mailto:info@nextlabeurope.eu" className="block font-medium" style={{ color: '#1a4fc4' }}>info@nextlabeurope.eu</a>
+              <p>Piazza Baracca 10, 48022 Lugo (RA)</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.3em] pt-2" style={{ color: '#9aa3b5', fontFamily: "'JetBrains Mono', monospace" }}>
+                Next Lab Europe APS · {lang === 'it' ? 'Associazione di Promozione Sociale' : 'Social Promotion Association'}
+              </p>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
