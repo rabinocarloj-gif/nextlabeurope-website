@@ -38,9 +38,9 @@ const PILLAR_ICONS = [
   <g key="c" fill="currentColor">
     {Array.from({ length: 12 }, (_, k) => {
       const ang = (k / 12) * Math.PI * 2 - Math.PI / 2;
-      const cx = 12 + Math.cos(ang) * 8, cy = 12 + Math.sin(ang) * 8;
+      const cx = 12 + Math.cos(ang) * 9.6, cy = 12 + Math.sin(ang) * 9.6;
       const pts = Array.from({ length: 10 }, (_, j) => {
-        const r = j % 2 === 0 ? 1.95 : 0.85; const a2 = (j / 10) * Math.PI * 2 - Math.PI / 2;
+        const r = j % 2 === 0 ? 2.2 : 0.95; const a2 = (j / 10) * Math.PI * 2 - Math.PI / 2;
         return `${(cx + Math.cos(a2) * r).toFixed(2)},${(cy + Math.sin(a2) * r).toFixed(2)}`;
       }).join(' ');
       return <polygon key={k} points={pts} />;
