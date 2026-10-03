@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import LegalModal from './LegalModal';
 
 const LOGO_URL = "/logo-next-lab-europe-bianco.png";
 
@@ -33,7 +32,6 @@ const translations = {
 
 export default function Footer({ lang }) {
   const t = translations[lang];
-  const [legalOpen, setLegalOpen] = useState(null); // 'privacy' | 'cookie' | null
 
   return (
     <footer style={{ backgroundColor: '#0C0C0C', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
@@ -70,14 +68,8 @@ export default function Footer({ lang }) {
               {lang === 'it' ? 'Legale' : 'Legal'}
             </h4>
             <div className="flex flex-col gap-3">
-              <button onClick={() => setLegalOpen('privacy')}
-                className="text-sm text-left transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                Privacy Policy
-              </button>
-              <button onClick={() => setLegalOpen('cookie')}
-                className="text-sm text-left transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                Cookie Policy
-              </button>
+              <Link to="/privacy" className="text-sm text-left transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>Privacy Policy</Link>
+              <Link to="/cookie-policy" className="text-sm text-left transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>Cookie Policy</Link>
               <a href="/documents/statuto-next-lab-europe-aps.pdf" target="_blank" rel="noopener noreferrer"
                 className="text-sm transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 {t.statuto}
@@ -89,8 +81,6 @@ export default function Footer({ lang }) {
           <p className="text-xs text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>{t.legal}</p>
         </div>
       </div>
-
-      <LegalModal lang={lang} type={legalOpen} onClose={() => setLegalOpen(null)} />
     </footer>
   );
 }

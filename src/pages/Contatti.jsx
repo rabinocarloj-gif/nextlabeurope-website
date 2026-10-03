@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const CONTACT_IMG = 'https://media.base44.com/images/public/6a22d208947a03fa34e3238c/8614fbdfe_generated_c9cdfb85.png';
@@ -102,6 +102,10 @@ export default function Contatti() {
                   disabled={sent}>
                   {sent ? t.sent : t.submit}
                 </button>
+                <p className="text-xs leading-relaxed" style={{ color: '#6b7280' }}>
+                  {lang === 'it' ? 'Inviando il modulo dichiari di aver letto l\'' : 'By sending this form you confirm you have read the '}
+                  <Link to="/privacy" className="underline hover:text-black">{lang === 'it' ? 'informativa sulla privacy' : 'Privacy Policy'}</Link>.
+                </p>
               </form>
             </motion.div>
 
