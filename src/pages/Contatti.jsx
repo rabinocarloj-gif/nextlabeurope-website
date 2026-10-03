@@ -29,7 +29,7 @@ const translations = {
     infoTitle: 'Dove siamo',
     email: 'info@nextlabeurope.eu',
     joinTitle: 'Vuoi far parte di Next Lab Europe?',
-    joinDesc: "Siamo alla ricerca delle nuove generazioni: giovani motivati che vogliano contribuire a costruire qualcosa di significativo per l'Europa.",
+    joinDesc: "Siamo alla ricerca di giovani motivati che vogliano contribuire a costruire qualcosa di significativo per l'Europa.",
     joinCta: 'Candidati ora',
   },
   en: {
@@ -56,7 +56,7 @@ const translations = {
     infoTitle: 'Where we are',
     email: 'info@nextlabeurope.eu',
     joinTitle: 'Want to be part of Next Lab Europe?',
-    joinDesc: 'We are looking for the new generations: motivated young people who want to contribute to building something meaningful for Europe.',
+    joinDesc: 'We are looking for motivated young people who want to contribute to building something meaningful for Europe.',
     joinCta: 'Apply now',
   },
 };
