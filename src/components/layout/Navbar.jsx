@@ -48,7 +48,7 @@ export default function Navbar({ lang, setLang }) {
       }`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between h-24">
           <Link to="/" className="flex items-center shrink-0">
-            <img src={LOGO_URL} alt="Next Lab Europe" className="h-20 w-auto object-contain" />
+            <img src={LOGO_URL} alt="Next Lab Europe" className="h-[68px] w-auto object-contain" />
           </Link>
           <div className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => (
