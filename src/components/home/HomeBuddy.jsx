@@ -182,128 +182,146 @@ export default function HomeBuddy() {
       const d = Math.max(0.5, Math.abs(x1 - x0) / (speed * K));
       q.add(d, (u, k, s) => ({ x: lerp(x0, x1, trap(k)), ground: y, f: x1 >= x0 ? 1 : -1, gait: 'walk', p: P.idle(s), ...fx(ex, u, k, s) }));
     };
-    let impactId = 0;
-    // salto naturale: carica, spinta, volo balistico, atterraggio ammortizzato (o rotolata parkour)
-    const jump = (q, a, b, opt = {}) => {
-      const f = opt.f ?? (b.x >= a.x ? 1 : -1);
-      q.add(0.42, () => ({ x: a.x, ground: a.y, f, p: P.prep, w: 11, expr: 'determined', look: [1, 0.9] }));
-      q.add(0.1, (u, k) => ({ x: a.x + k * 1.5 * f, ground: a.y, f, p: P.push, w: 30, expr: 'determined', look: [1, 0.3] }));
-      const dy = b.y - a.y, Rr = (opt.r ?? 14) * K + Math.max(0, -dy);
-      const v0 = 2 * Rr + Math.sqrt(Math.max(0, 4 * Rr * Rr + 4 * Rr * dy)), A = dy + v0;
-      const tAir = 0.38 + 0.03 * Math.sqrt(Math.max(1, (dy + Rr) / K)) + Math.abs(b.x - a.x) / (900 * K);
-      const big = dy > 260 * K;
-      q.add(tAir, (u, k, s) => ({ x: lerp(a.x + 1.5 * f, b.x, k), ground: a.y - v0 * k + A * k * k, f, p: big && k > 0.3 && k < 0.8 ? P.flail(s) : k < 0.42 ? P.airUp : P.airDown, w: 15, expr: big && k > 0.3 ? 'wow' : 'determined', look: [1, k < 0.5 ? 0 : 1.2] }));
-      const id = ++impactId, roll = opt.roll ?? dy > 150 * K;
-      if (roll) {
-        const rx = b.x + f * 30 * K;
-        q.add(0.1, () => ({ x: b.x, ground: b.y, f, p: P.land, w: 34, impact: id, expr: 'determined', look: [1, 0.6] }));
-        q.add(0.62, (u, k) => ({ x: lerp(b.x, rx, ease(k)), ground: b.y, f, rot: 360 * ease(k), p: P.tuck, w: 36, expr: 'determined', look: [1, 0] }));
-        q.add(0.28, () => ({ x: rx, ground: b.y, f, p: P.land, w: 18, expr: 'determined', look: [1, 0] }));
-        stand(q, 0.55, rx, b.y, f, { w: 8, expr: 'happy', look: [1, -0.2] });
-        return { x: rx, y: b.y, f };
-      }
-      q.add(0.32, () => ({ x: b.x, ground: b.y, f, p: P.land, w: 30, impact: id, expr: 'determined', look: [1, 0.6] }));
-      stand(q, 0.5, b.x, b.y, f, { w: 8, expr: 'happy', look: [1, 0] });
-      return { x: b.x, y: b.y, f };
-    };
+    let impactId = 0, floatToggle = 0;
+    const SP = 1.3; // velocità generale delle scene
+    const topY = () => window.scrollY + 70 + 55 * K; // subito sotto la barra in alto
+    const offTop = (pt) => pt.y < window.scrollY + 20;
     // teletrasporto: colonna di luce, l'omino si assottiglia e scompare / ricompare
-    const beamOut = (q, a, f) => {
-      q.add(0.9, (u, k, s) => ({ x: a.x, ground: a.y, f, p: P.stand, arms: { shR: 40, elR: 30 }, w: 10, expr: 'happy', look: [0, 0.1], beam: ease(k / 0.4), sx: lerp(1, 0.06, ease((k - 0.25) / 0.75)), sy: lerp(1, 1.5, ease((k - 0.25) / 0.75)), flicker: k > 0.3 }));
-      q.add(0.45, (u, k) => ({ gone: true, beamAt: a, beam: 1 - ease(k) }));
+    const beamOut = (q, a, f, quick) => {
+      q.add(quick ? 0.6 : 0.85, (u, k) => ({ x: a.x, ground: a.y, f, p: P.stand, arms: { shR: 40, elR: 30 }, w: 12, expr: 'happy', look: [0, 0.1], beam: ease(k / 0.4), sx: lerp(1, 0.06, ease((k - 0.25) / 0.75)), sy: lerp(1, 1.5, ease((k - 0.25) / 0.75)), flicker: k > 0.3 }));
+      q.add(quick ? 0.2 : 0.35, (u, k) => ({ gone: true, beamAt: a, beam: 1 - ease(k) }));
     };
-    const beamIn = (q, b, f) => {
-      q.add(0.35, (u, k) => ({ gone: true, beamAt: b, beam: ease(k) }));
-      q.add(0.85, (u, k, s) => ({ x: b.x, ground: b.y, f, p: P.idle(s), w: 10, expr: 'wow', look: [0.6, 0], beam: 1 - ease((k - 0.3) / 0.7), sx: lerp(0.06, 1, backOut(k / 0.8)), sy: lerp(1.5, 1, backOut(k / 0.8)), flicker: k < 0.45 }));
+    const beamIn = (q, b, f, quick) => {
+      q.add(quick ? 0.2 : 0.3, (u, k) => ({ gone: true, beamAt: b, beam: ease(k) }));
+      q.add(quick ? 0.6 : 0.8, (u, k, s) => ({ x: b.x, ground: b.y, f, p: P.idle(s), w: 12, expr: 'wow', look: [0.6, 0], beam: 1 - ease((k - 0.3) / 0.7), sx: lerp(0.06, 1, backOut(k / 0.8)), sy: lerp(1.5, 1, backOut(k / 0.8)), flicker: k < 0.45 }));
     };
+    const holdChute = (s) => ({ ...P.idle(s), shL: 166, elL: 8, shR: 158, elR: 12 });
+    const holdUmb = (s) => ({ ...P.idle(s), shR: 174, elR: 2, shL: 50, elL: 30 });
 
-    // ---------- viaggi tra le sezioni ----------
-    function travel(q, mode, a, b) {
-      if (mode === 'teleport' || !a) { if (a) beamOut(q, a, a.f); beamIn(q, b, b.f ?? 1); return { ...b, f: b.f ?? 1 }; }
-      const dx = b.x - a.x, dy = b.y - a.y, dist = Math.hypot(dx, dy);
-      if ((mode === 'parachute' || mode === 'umbrella') && dy < 160 * K) mode = 'auto';
-      if (mode === 'zip' && dist < 140 * K) mode = 'auto';
+    // paracadute / ombrello: si apre da fermo, un passo oltre il bordo e giù dondolando (mai salti)
+    function float(q, a, b, um) {
+      const f = b.x >= a.x ? 1 : -1;
+      const top = topY();
+      let sx, sy;
+      const canopy = (v) => (um ? { umbrella: v } : { chute: v });
+      if (offTop(a) || (a.y < top && b.y - top > 60 * K)) { sx = b.x - f * 46 * K; sy = Math.max(top, Math.min(a.y, b.y - 40 * K)); }
+      else {
+        q.add(0.45, (u, k, s) => ({ x: a.x, ground: a.y, f, p: um ? holdUmb(s) : holdChute(s), w: 14, ...canopy(ease(k)), expr: 'joy', look: [0.3, -1] }));
+        q.add(0.32, (u, k, s) => ({ x: lerp(a.x, a.x + f * 10 * K, k), ground: a.y + k * k * 5 * K, f, gait: 'walk', p: um ? holdUmb(s) : holdChute(s), ...canopy(1), expr: 'joy', look: [1, 0.8] }));
+        sx = a.x + f * 10 * K; sy = a.y + 5 * K;
+      }
+      const dd = clamp((b.y - sy) / ((um ? 120 : 145) * K), 0.9, um ? 3.2 : 2.8);
+      q.add(dd, (u, k, s) => {
+        const sway = Math.sin(u * (um ? 2.6 : 3)) * (1 - k * k);
+        return { x: lerp(sx, b.x, ease(k)) + sway * 6 * K, ground: lerp(sy, b.y, k), f, rot: sway * (um ? 9 : 6), p: um ? P.umbrella(s) : P.hang(s), w: 12, ...canopy(1), expr: k < 0.6 ? 'joy' : 'happy', lookAt: k < 0.5 ? viewer() : [b.x, b.y + 40] };
+      });
+      const id = ++impactId;
+      q.add(0.32, (u, k, s) => ({ x: b.x, ground: b.y, f, p: P.land, w: 24, impact: id, ...canopy(1 - ease(k)), chuteDrop: um ? 0 : k, expr: 'happy', look: [1, 0.5] }));
+      q.add(0.35, (u, k, s) => ({ x: b.x, ground: b.y, f, p: P.idle(s), w: 12, expr: 'happy', look: [1, 0] }));
+      return { ...b, f };
+    }
+    // corda: compare un cavo, ci si aggrappa e scivola (anche entrando dall'alto se parte fuori schermo)
+    function rope(q, a, b) {
+      let f = b.x >= a.x ? 1 : -1;
+      const H = 35 * K, top = topY();
+      let xs = a.x, ys = a.y;
+      const enter = offTop(a);
+      if (enter) { xs = b.x - f * Math.max(110 * K, Math.min(260 * K, (b.y - top) * 0.7)); if (xs < window.scrollX + 10) { f = -f; xs = b.x - f * 110 * K; } ys = Math.min(top, b.y - 10 * K); }
+      const A0 = [xs, ys - H], B0 = [b.x, b.y - H], zip = { a: A0, b: B0 };
+      if (!enter) {
+        q.add(0.4, (u, k, s) => ({ x: a.x, ground: a.y, f, p: P.idle(s), w: 12, zip, zipK: ease(k), expr: 'curious', lookAt: [lerp(A0[0], B0[0], 0.35), lerp(A0[1], B0[1], 0.35)] }));
+        q.add(0.28, (u, k, s) => ({ x: a.x, ground: a.y - 3 * K * ease(k), f, p: P.zip(s), w: 18, zip, zipK: 1, expr: 'joy', look: [1, -0.6] }));
+      }
+      const ds = clamp(Math.hypot(B0[0] - A0[0], B0[1] - A0[1]) / (360 * K), 0.7, 2.2);
+      q.add(ds, (u, k, s) => {
+        const p = enter ? 1 - (1 - k) * (1 - k) : k * k * (3 - 2 * k);
+        return { x: lerp(xs, b.x, p), ground: lerp(ys - 3 * K, b.y - 3 * K, p), f, rot: Math.sin(k * Math.PI) * 7, p: P.zip(s), w: 16, zip, zipK: enter ? 1 : 1, expr: 'joy', lookAt: viewer(), trolley: true };
+      });
+      const id = ++impactId;
+      q.add(0.3, (u, k) => ({ x: b.x, ground: b.y, f, p: P.land, w: 26, impact: id, zip, zipK: 1, zipFade: k, expr: 'happy', look: [1, 0.4] }));
+      q.add(0.3, (u, k, s) => ({ x: b.x, ground: b.y, f, p: P.idle(s), w: 12, expr: 'happy', look: [1, 0] }));
+      return { ...b, f };
+    }
+    function move(q, a, b, mode = 'auto', opt = {}) {
+      if (!a) { beamIn(q, b, b.f ?? 1); return { ...b, f: b.f ?? 1 }; }
+      const dx = b.x - a.x, dy = b.y - a.y;
+      if (mode === 'walk' && (Math.abs(dy) > 12 * K || offTop(a))) mode = 'auto';
+      if (mode !== 'teleport' && dy < -12 * K) mode = 'teleport';
+      if ((mode === 'parachute' || mode === 'umbrella') && dy < 40 * K) mode = 'rope';
       if (mode === 'auto') {
-        if (Math.abs(dy) < 12 * K && Math.abs(dx) < 420 * K) { walk(q, a.x, b.x, a.y, 30); return { ...b, f: dx >= 0 ? 1 : -1 }; }
-        return jump(q, a, b, {});
+        if (Math.abs(dy) <= 12 * K && opt.walk && !offTop(a)) mode = 'walk';
+        else if (dy < 150 * K && !offTop(a)) mode = 'rope';
+        else mode = (floatToggle++ % 2) ? 'umbrella' : 'parachute';
       }
-      const f = dx >= 0 ? 1 : -1;
-      if (mode === 'parachute' || mode === 'umbrella') {
-        const um = mode === 'umbrella';
-        let hx = a.x + f * 22 * K, hy = a.y + 26 * K;
-        const top = window.scrollY + 70 + 60 * K;
-        if (a.y < top + 40 * K && b.y - top > 120 * K) {
-          // il punto di partenza è già fuori schermo: entra dall'alto già appeso
-          hx = b.x - f * 50 * K; hy = top;
-        } else {
-          // piccolo salto giù dal bordo
-          q.add(0.4, () => ({ x: a.x, ground: a.y, f, p: P.prep, w: 11, expr: 'happy', look: [1, 0.9] }));
-          q.add(0.1, (u, k) => ({ x: a.x, ground: a.y, f, p: P.push, w: 30, expr: 'happy', look: [1, 0.3] }));
-          const R0 = 12 * K, ddy = hy - a.y, v0 = 2 * R0 + Math.sqrt(4 * R0 * R0 + 4 * R0 * ddy), A = ddy + v0;
-          q.add(0.42, (u, k) => ({ x: lerp(a.x, hx, k), ground: a.y - v0 * k + A * k * k, f, p: P.airUp, w: 16, expr: 'joy', look: [1, 1] }));
-        }
-        // si apre e scende dondolando
-        const dd = clamp((b.y - hy) / ((um ? 70 : 85) * K), 2.2, um ? 5 : 4.4);
-        const yA = hy;
-        q.add(dd, (u, k, s) => {
-          const sway = Math.sin(u * (um ? 2.2 : 2.7)) * (1 - k * k);
-          return {
-            x: lerp(hx, b.x, ease(k)) + sway * 7 * K, ground: lerp(yA, b.y, k < 0.92 ? k : 0.92 + (k - 0.92) * (1 - (k - 0.92) * 4)), f,
-            rot: sway * (um ? 9 : 6), p: um ? P.umbrella(s) : P.hang(s), w: 10,
-            chute: um ? null : ease(u / 0.45), umbrella: um ? ease(u / 0.35) : null,
-            expr: k < 0.15 ? 'wow' : k < 0.7 ? 'joy' : 'happy', lookAt: k < 0.5 ? viewer() : [b.x, b.y + 40], air: true,
-          };
-        });
-        const id = ++impactId;
-        q.add(0.36, (u, k) => ({ x: b.x, ground: b.y, f, p: P.land, w: 22, impact: id, chute: um ? null : 1 - ease(k), umbrella: um ? 1 - ease(k) : null, chuteDrop: k, expr: 'happy', look: [1, 0.5] }));
-        stand(q, 0.6, b.x, b.y, f, { w: 8, expr: 'happy', look: [1, 0] });
-        return { ...b, f };
-      }
-      if (mode === 'zip') {
-        const H = 35 * K, xs = a.x + f * 4 * K;
-        const A0 = [xs, a.y - H - 4 * K], B0 = [b.x, b.y - H - 4 * K];
-        const zip = { a: A0, b: B0 };
-        q.add(0.6, (u, k, s) => ({ x: a.x, ground: a.y, f, p: P.idle(s), w: 10, zip, zipK: ease(k), expr: 'curious', lookAt: [lerp(A0[0], B0[0], 0.3), lerp(A0[1], B0[1], 0.3)] }));
-        q.add(0.35, () => ({ x: a.x, ground: a.y, f, p: P.prep, w: 12, zip, zipK: 1, expr: 'determined', look: [1, -1] }));
-        q.add(0.22, (u, k) => ({ x: lerp(a.x, xs, k), ground: a.y - 4 * K * Math.sin(k * Math.PI / 2), f, p: P.zip(0), w: 26, zip, zipK: 1, expr: 'joy', look: [1, -0.6] }));
-        const ds = clamp(Math.hypot(B0[0] - A0[0], B0[1] - A0[1]) / (330 * K), 1.1, 3.2);
-        q.add(ds, (u, k, s) => {
-          const p = k * k * (3 - 2 * k);
-          return { x: lerp(xs, b.x, p), ground: lerp(a.y - 4 * K, b.y - 4 * K, p), f, rot: Math.sin(k * Math.PI) * 8, p: P.zip(s), w: 14, zip, zipK: 1, expr: 'joy', lookAt: viewer(), air: true, trolley: true };
-        });
-        const id = ++impactId;
-        q.add(0.34, (u, k) => ({ x: b.x, ground: b.y, f, p: P.land, w: 24, impact: id, zip, zipK: 1, zipFade: k, expr: 'happy', look: [1, 0.5] }));
-        stand(q, 0.5, b.x, b.y, f, { w: 8, zip, zipK: 1, zipFade: 1, expr: 'happy', look: [1, 0] });
-        return { ...b, f };
-      }
-      return jump(q, a, b, {});
+      if (mode === 'walk') { walk(q, a.x, b.x, a.y, 38); return { ...b, f: dx >= 0 ? 1 : -1 }; }
+      if (mode === 'teleport') { if (!offTop(a)) beamOut(q, a, a.f, opt.quick ?? true); beamIn(q, b, b.f ?? (dx >= 0 ? 1 : -1), opt.quick ?? true); return { ...b, f: b.f ?? (dx >= 0 ? 1 : -1) }; }
+      if (mode === 'rope') return rope(q, a, b);
+      return float(q, a, b, mode === 'umbrella');
     }
 
     // ---------- gesti ricorrenti ----------
-    const stomp = (u, t0) => { const b = pulse(u, t0, 0.42); return { hipR: 58 * b, kneeR: -78 * b }; };
+    const stomp = (u, t0) => { const b = pulse(u, t0, 0.38); return { hipR: 58 * b, kneeR: -78 * b }; };
     const waveHand = (s) => ({ rel: 'head', x: 5.5 + Math.sin(s * 11) * 2.6, y: -9 });
+    const heart = { rel: 'sh', x: 1.6, y: 3.2 };
+    // posto a sedere sulla barca del progetto 2 (segue il dondolio dell'icona)
+    const boatSeat = () => {
+      const icon = $('project-icon-1'); if (!icon) return null;
+      const r = docRect(icon), sc = r.w / 64, g = icon.querySelector('.boat-bob');
+      let m = [1, 0, 0, 1, 0, 0];
+      const tr = g && getComputedStyle(g).transform;
+      if (tr && tr.startsWith('matrix(')) m = tr.slice(7, -1).split(',').map(Number);
+      const px = 41 - 32, py = 46 - 48;
+      return { x: r.l + (32 + m[0] * px + m[2] * py + m[4]) * sc, y: r.t + (48 + m[1] * px + m[3] * py + m[5]) * sc, rot: Math.atan2(m[1], m[0]) / D };
+    };
 
     // ---------- atti, uno per sezione ----------
     const ACTS = [
-      { // 0 — titolo: saluto, anello di stelle, pulsante
-        anchor: 'hero-t1', mode: 'teleport',
-        entry() { const L = lines('hero-t1')[0]; return L && { x: L.l + L.w * 0.3, y: L.cap, f: 1 }; },
+      { // 0 — si affaccia dal logo, saluta, si presenta; poi titolo, stelle e pulsante
+        anchor: 'hero-t1', mode: 'none',
+        entry() {
+          const img = document.querySelector('nav a[aria-label="Home"] img'); if (!img) return null;
+          const r = docRect(img), edge = r.l + r.w * 0.612;
+          return { x: edge - 13 * K, y: r.t + r.h * 0.985, f: 1, edge };
+        },
         build(q, a) {
+          const edge = a.edge, hid = a.x, ly = a.y, out = edge + 16 * K;
           const L1 = lines('hero-t1')[0], L3 = lines('hero-t3')[0], cta = R('hero-cta'), ring = R('hero-ring');
-          stand(q, 2.0, a.x, a.y, 1, (u, k, s) => ({ ikR: u > 0.3 && u < 1.8 ? waveHand(s) : null, expr: u < 0.4 ? 'wow' : 'joy', look: [0, 0.15] }));
+          const title = L1 ? [L1.cx, L1.cy] : viewer();
+          const lean = (k0, k1, h0, h1) => (u, k, s) => ({ p: { ...P.idle(s), torso: lerp(k0, k1, ease(k)), head: lerp(h0, h1, ease(k)) } });
+          stand(q, 0.5, hid, ly, 1, { clip: edge, expr: 'neutral', look: [1, 0] });
+          stand(q, 0.7, hid, ly, 1, (u, k, s) => ({ ...lean(3, 44, 0, -18)(u, k, s), w: 12, clip: edge, expr: 'curious', lookAt: title }));
+          stand(q, 1.3, hid, ly, 1, (u, k, s) => ({ p: { ...P.idle(s), torso: 44, head: -18 }, clip: edge, expr: u < 0.8 ? 'curious' : 'wow', lookAt: u < 0.6 ? title : viewer() }));
+          stand(q, 0.3, hid, ly, 1, (u, k, s) => ({ ...lean(44, 3, -18, 0)(u, k, s), w: 20, clip: edge, expr: 'wow', look: [-1, 0] }));
+          stand(q, 0.4, hid, ly, 1, { clip: edge, expr: 'neutral', look: [-0.5, 0] });
+          stand(q, 0.5, hid, ly, 1, (u, k, s) => ({ ...lean(3, 36, 0, -14)(u, k, s), w: 12, clip: edge, expr: 'happy', lookAt: viewer() }));
+          walk(q, hid, out, ly, 30, { clip: edge, expr: 'happy', lookAt: viewer() });
+          // saluta e si presenta
+          stand(q, 1.6, out, ly, 1, (u, k, s) => ({ ikR: u > 0.15 && u < 1.5 ? waveHand(s) : null, expr: 'joy', look: [0, 0.2] }));
+          stand(q, 1.7, out, ly, 1, (u, k, s) => {
+            const bow = pulse(u, 0.45, 0.9);
+            return { p: { ...P.stand, torso: -3 + bow * 38, head: bow * 12 }, ikR: heart, w: 12, expr: bow > 0.3 ? 'proud' : 'happy', look: [0, 0.2] };
+          });
+          stand(q, 1.0, out, ly, 1, (u, k, s) => ({ p: { ...P.idle(s), ...P.tada }, expr: 'joy', look: [0, 0.1] }));
+          let p = { x: out, y: ly, f: 1 };
+          if (!L1) return p;
+          // giù sul titolo con l'ombrello
+          p = move(q, p, { x: L1.l + L1.w * 0.28, y: L1.cap }, 'umbrella');
           const endX = L1.l + L1.w * 0.86;
-          walk(q, a.x, endX, a.y, 26, (u, k) => ({ ikR: k < 0.5 ? { rel: 'head', x: 4.6, y: 5.4 } : null, expr: k < 0.5 ? 'thinking' : 'curious', bubble: ['idea', 'flags', 'people'], lookAt: [lerp(a.x, endX, k) + 30 * K, a.y + 30 * K] }));
-          const t3 = [L3.cx, L3.cy];
-          stand(q, 1.6, endX, a.y, -1, (u) => ({ ikR: u > 0.35 ? { world: t3 } : null, expr: u < 0.5 ? 'wow' : 'happy', lookAt: t3 }));
-          let p = jump(q, { x: endX, y: a.y }, { x: L3.l + L3.w * 0.55, y: L3.cap }, {});
-          stand(q, 2.0, p.x, p.y, p.f, (u, k, s) => ({ p: { ...P.idle(s), ...P.cheer }, lift: Math.abs(Math.sin(u * Math.PI * 2.4)) * 7 * K * (1 - k * 0.6), expr: 'joy', look: [0, -0.3], bubble: u > 1.0 ? ['people'] : null }));
-          const rc = ring ? [ring.cx, ring.cy] : [VW() - 60, a.y];
-          const fr = rc[0] >= p.x ? 1 : -1;
-          stand(q, 2.6, p.x, p.y, fr, (u) => ({ ikR: u > 0.2 && u < 1.6 ? { world: rc } : null, fire: u > 0.5 ? { key: 'ring', ev: 'buddy:ring' } : null, expr: u < 1.2 ? 'wow' : 'joy', lookAt: rc }));
+          walk(q, p.x, endX, p.y, 34, (u, k) => ({ ikR: k < 0.45 ? { rel: 'head', x: 4.6, y: 5.4 } : null, expr: k < 0.45 ? 'thinking' : 'curious', lookAt: [lerp(p.x, endX, k) + 30 * K, p.y + 30 * K] }));
+          const t3 = L3 ? [L3.cx, L3.cy] : viewer();
+          stand(q, 1.2, endX, p.y, -1, (u) => ({ ikR: u > 0.25 ? { world: t3 } : null, expr: u < 0.4 ? 'wow' : 'happy', lookAt: t3 }));
+          p = { x: endX, y: p.y, f: -1 };
+          if (L3) {
+            p = move(q, p, { x: L3.l + L3.w * 0.55, y: L3.cap }, 'rope');
+            stand(q, 1.5, p.x, p.y, p.f, (u, k, s) => ({ p: { ...P.idle(s), ...P.cheer }, lift: Math.abs(Math.sin(u * Math.PI * 2.6)) * 6 * K * (1 - k * 0.6), expr: 'joy', look: [0, -0.3] }));
+          }
+          const rc = ring ? [ring.cx, ring.cy] : [VW() - 60, p.y];
+          stand(q, 2.0, p.x, p.y, rc[0] >= p.x ? 1 : -1, (u) => ({ ikR: u > 0.15 && u < 1.3 ? { world: rc } : null, fire: u > 0.4 ? { key: 'ring', ev: 'buddy:ring' } : null, expr: u < 1 ? 'wow' : 'joy', lookAt: rc }));
           if (cta) {
             const c = { x: cta.l + cta.w * 0.74, y: cta.t };
-            p = jump(q, p, c, { r: 10 });
-            stand(q, 2.4, c.x, c.y, -1, (u, k, s) => ({ p: { ...P.idle(s), torso: 14, head: 6 }, ikR: { world: [cta.cx - cta.w * 0.15, cta.cy] }, hl: 'hero-cta', expr: 'happy', lookAt: u < 1.2 ? [cta.cx, cta.cy] : viewer(), bubble: u > 0.8 ? ['heart'] : null }));
-            stand(q, 1.8, c.x, c.y, 1, () => ({ ikR: { rel: 'hip', x: 9, y: 10 }, expr: 'happy', look: [0.5, 1.2], bubble: ['down'] }));
+            p = move(q, p, c, 'parachute');
+            stand(q, 1.9, c.x, c.y, -1, (u, k, s) => ({ p: { ...P.idle(s), torso: 14, head: 6 }, ikR: { world: [cta.cx - cta.w * 0.15, cta.cy] }, hl: 'hero-cta', expr: 'happy', lookAt: u < 1 ? [cta.cx, cta.cy] : viewer() }));
+            stand(q, 1.2, c.x, c.y, 1, () => ({ ikR: { rel: 'hip', x: 9, y: 10 }, expr: 'happy', look: [0.5, 1.2] }));
             return { x: c.x, y: c.y, f: 1 };
           }
           return p;
@@ -315,33 +333,30 @@ export default function HomeBuddy() {
         build(q, a) {
           const acc = lines('about-accent'), A = acc[acc.length - 1];
           const at = A ? [A.cx, A.cy] : [a.x + 80, a.y + 30];
-          stand(q, 2.8, a.x, a.y, at[0] >= a.x ? 1 : -1, (u) => ({ ikR: u > 0.3 ? { world: at } : null, expr: 'happy', lookAt: u < 1.6 ? at : viewer(), bubble: u > 0.6 ? ['flags', 'people'] : null }));
-          stand(q, 1.6, a.x, a.y, 1, () => ({ p: P.stand, ikR: { rel: 'sh', x: 1.6, y: 3.2 }, expr: 'proud', look: [0.4, -0.6] }));
+          stand(q, 2.0, a.x, a.y, at[0] >= a.x ? 1 : -1, (u) => ({ ikR: u > 0.25 ? { world: at } : null, expr: 'happy', lookAt: u < 1.2 ? at : viewer() }));
+          stand(q, 1.3, a.x, a.y, 1, () => ({ p: P.stand, ikR: heart, expr: 'proud', look: [0.4, -0.6] }));
           return { x: a.x, y: a.y, f: 1 };
         },
       },
-      { // 2 — i tre pilastri
+      { // 2 — i tre pilastri (unica sezione con la nuvoletta dei pensieri)
         anchor: 'pillars', mode: 'auto',
         entry() { const r = R('pillar-icon-0'); return r && { x: r.cx, y: r.t, f: 1 }; },
         build(q, a) {
           const ic = [0, 1, 2].map((i) => R(`pillar-icon-${i}`));
-          // 01 imprenditoria: mima la freccia della crescita
-          stand(q, 2.8, a.x, a.y, 1, (u, k, s) => {
-            const g = clamp((u - 0.4) / 1.6, 0, 1), st = g + Math.sin(g * Math.PI * 6) * 0.05;
-            return { p: { ...P.idle(s), torso: lerp(10, -6, g), head: lerp(4, -12, g) }, ikR: { rel: 'hip', x: lerp(-2, 9, st), y: lerp(2, -27, st) }, hl: 'pillar-0', expr: u < 0.6 ? 'curious' : u < 2 ? 'determined' : 'joy', look: [0.8, lerp(0.6, -1.3, g)], bubble: u > 2.0 ? ['rocket'] : null };
+          stand(q, 2.4, a.x, a.y, 1, (u, k, s) => {
+            const g = clamp((u - 0.3) / 1.4, 0, 1), st = g + Math.sin(g * Math.PI * 6) * 0.05;
+            return { p: { ...P.idle(s), torso: lerp(10, -6, g), head: lerp(4, -12, g) }, ikR: { rel: 'hip', x: lerp(-2, 9, st), y: lerp(2, -27, st) }, hl: 'pillar-0', expr: u < 0.5 ? 'curious' : u < 1.7 ? 'determined' : 'joy', look: [0.8, lerp(0.6, -1.3, g)], bubble: u > 1.5 ? ['rocket'] : null };
           });
-          let p = jump(q, a, { x: ic[1].cx, y: ic[1].t }, { r: 12, roll: false });
-          // 02 formazione: legge un libro
-          stand(q, 3.0, p.x, p.y, 1, (u, k, s) => ({ arms: P.book, book: u < 2.4 ? 1 : 0, hl: 'pillar-1', expr: u < 2.2 ? 'focused' : 'wow', look: u < 2.2 ? [Math.sin(u * 5) * 0.9, 1] : [0.6, -0.8], bubble: u > 2.3 ? ['idea'] : null }));
-          p = jump(q, p, { x: ic[2].cx, y: ic[2].t }, { r: 12, roll: false });
-          // 03 valori europei: mano sul cuore, stelle che gli girano intorno
-          stand(q, 3.0, p.x, p.y, 1, () => ({ p: P.stand, ikR: { rel: 'sh', x: 1.6, y: 3.2 }, orbit: true, hl: 'pillar-2', expr: 'proud', look: [0.5, -1] }));
+          let p = move(q, a, { x: ic[1].cx, y: ic[1].t });
+          stand(q, 2.6, p.x, p.y, 1, (u) => ({ arms: P.book, book: u < 2.0 ? 1 : 0, hl: 'pillar-1', expr: u < 1.8 ? 'focused' : 'wow', look: u < 1.8 ? [Math.sin(u * 5) * 0.9, 1] : [0.6, -0.8], bubble: u > 1.9 ? ['idea'] : null }));
+          p = move(q, p, { x: ic[2].cx, y: ic[2].t });
+          stand(q, 2.6, p.x, p.y, 1, (u) => ({ p: P.stand, ikR: heart, orbit: true, hl: 'pillar-2', expr: 'proud', look: [0.5, -1], bubble: u > 1.2 ? ['flags'] : null }));
           return p;
         },
       },
       { // 3 — il direttivo
-        anchor: 'team-row', mode: 'auto',
-        entry() { const c = R('team-0'); return c && { x: c.l + c.w * 0.32, y: c.t, f: 1 }; },
+        anchor: 'team-row', mode: 'umbrella',
+        entry() { const c = R('team-0'); return c && { x: c.l + c.w * 0.4, y: c.t, f: 1 }; },
         build(q, a) {
           const cards = [0, 1, 2].map((i) => R(`team-${i}`));
           const allVisible = cards.every((c) => c && c.l >= 0 && c.r <= VW());
@@ -350,110 +365,117 @@ export default function HomeBuddy() {
             let p = a;
             const gestures = ['present', 'tada', 'thumbs'];
             cards.forEach((c, i) => {
-              const x = c.l + c.w * 0.5;
-              if (i > 0) p = jump(q, p, { x: c.l + 22 * K, y: c.t }, { r: 10, roll: false });
-              walk(q, p.x, x, c.t, 26, { expr: 'happy', look: [1, 0.6] });
-              p = { x, y: c.t, f: 1 };
+              const x = c.l + c.w * 0.4;
+              if (i > 0) p = move(q, p, { x, y: c.t }, 'rope');
               const g = gestures[i];
-              stand(q, 2.4, x, c.t, -1, (u, k, s) => ({
-                p: g === 'tada' && u > 0.6 ? { ...P.idle(s), ...P.tada } : { ...P.idle(s), torso: 12, head: 8 },
-                arms: g === 'thumbs' && u > 0.9 ? P.thumbs : null,
-                ikR: g === 'present' || (g !== 'thumbs' && u < 0.6) || (g === 'thumbs' && u <= 0.9) ? { world: name(i) } : null,
-                hl: `team-${i}`, expr: 'happy', lookAt: u < 1.2 ? name(i) : viewer(),
+              stand(q, 1.9, x, c.t, -1, (u, k, s) => ({
+                p: g === 'tada' && u > 0.5 ? { ...P.idle(s), ...P.tada } : { ...P.idle(s), torso: 12, head: 8 },
+                arms: g === 'thumbs' && u > 0.7 ? P.thumbs : null,
+                ikR: g === 'present' || (g === 'tada' && u <= 0.5) || (g === 'thumbs' && u <= 0.7) ? { world: name(i) } : null,
+                hl: `team-${i}`, expr: 'happy', lookAt: u < 1 ? name(i) : viewer(),
               }));
+              p = { x, y: c.t, f: -1 };
             });
             return p;
           }
-          // telefono: presenta una scheda alla volta e preme la freccia del carosello
           const visibleCard = () => {
             let best = 0, bd = 1e9;
             for (let i = 0; i < 3; i++) { const r = R(`team-${i}`); if (!r) continue; const d = Math.abs(r.cx - (window.scrollX + VW() / 2)); if (d < bd) { bd = d; best = i; } }
             return best;
           };
           const cardTarget = () => { const i = visibleCard(), r = R(`team-${i}`); return { i, pt: [r.l + r.w * 0.4, r.t + r.h * 0.35] }; };
-          stand(q, 2.4, a.x, a.y, -1, (u, k, s) => ({ p: { ...P.idle(s), torso: 12, head: 8 }, ikR: { world: name(0) }, hl: 'team-0', expr: 'happy', lookAt: u < 1.2 ? name(0) : viewer() }));
+          stand(q, 1.9, a.x, a.y, -1, (u, k, s) => ({ p: { ...P.idle(s), torso: 12, head: 8 }, ikR: { world: name(0) }, hl: 'team-0', expr: 'happy', lookAt: u < 1 ? name(0) : viewer() }));
           const nb = R('team-next');
           if (!nb) return a;
-          let p = jump(q, a, { x: nb.cx, y: nb.t }, { r: 10 });
+          let p = move(q, a, { x: nb.cx, y: nb.t });
           for (let n = 1; n <= 2; n++) {
-            stand(q, 1.2, p.x, p.y, -1, (u) => ({ p: { ...BASE, ...stomp(u, 0.3) }, click: u > 0.55 ? { key: `next${n}`, name: 'team-next' } : null, expr: 'determined', look: [0.6, 1.2] }));
-            stand(q, 2.4, p.x, p.y, -1, (u) => { const c = cardTarget(); return { ikR: u > 0.4 ? { world: c.pt } : null, hl: `team-${c.i}`, expr: u < 0.6 ? 'curious' : 'happy', lookAt: u < 1.4 ? c.pt : viewer() }; });
+            stand(q, 0.9, p.x, p.y, -1, (u) => ({ p: { ...BASE, ...stomp(u, 0.2) }, click: u > 0.4 ? { key: `next${n}`, name: 'team-next' } : null, expr: 'determined', look: [0.6, 1.2] }));
+            stand(q, 1.9, p.x, p.y, -1, (u) => { const c = cardTarget(); return { ikR: u > 0.3 ? { world: c.pt } : null, hl: `team-${c.i}`, expr: u < 0.5 ? 'curious' : 'happy', lookAt: u < 1.1 ? c.pt : viewer() }; });
           }
           return p;
         },
       },
-      { // 4 — le tre missioni (razzo, formazione, impegno civico)
+      { // 4 — missione 1: il razzo
         anchor: 'mission-0', mode: 'teleport',
         entry() { const r = R('mission-icon-0'); return r && { x: r.cx, y: r.t, f: 1 }; },
         build(q, a) {
-          const ic = [0, 1, 2].map((i) => R(`mission-icon-${i}`));
-          const tl = [0, 1, 2].map((i) => lines(`mission-title-${i}`)[0]);
-          stand(q, 0.8, a.x, a.y, 1, { hl: 'mission-0', expr: 'curious', look: [0.6, 1.3] });
-          stand(q, 1.2, a.x, a.y, 1, (u) => ({ p: { ...BASE, ...stomp(u, 0.05), ...stomp(u, 0.6) }, hl: 'mission-0', fire: u > 0.85 ? { key: 'rocket', ev: 'buddy:mission', detail: 0 } : null, expr: 'determined', look: [0.6, 1.3] }));
-          stand(q, 0.5, a.x, a.y, 1, (u, k, s) => ({ x: a.x + Math.sin(s * 60) * 0.7 * K, hl: 'mission-0', expr: 'wow', look: [0.2, 1.2] }));
-          const off = { x: tl[0] ? tl[0].l + tl[0].w * 0.82 : a.x + 90 * K, y: tl[0] ? tl[0].cap : a.y + 60 * K };
-          let p = jump(q, a, off, { r: 16, roll: false });
-          const sky = [ic[0].r + 40 * K, ic[0].t - 60 * K];
-          stand(q, 2.6, p.x, p.y, -1, (u, k, s) => ({ p: u > 0.5 ? { ...P.idle(s), ...P.cheer } : P.idle(s), lift: u > 0.5 ? Math.abs(Math.sin(u * Math.PI * 2.2)) * 6 * K : 0, hl: 'mission-0', expr: u < 0.5 ? 'wow' : 'joy', lookAt: u < 1.4 ? [ic[0].cx, ic[0].cy] : sky }));
-          // formazione: tre colpi, dal cappello alla lampadina
-          p = jump(q, p, { x: ic[1].cx, y: ic[1].t }, { r: 14, roll: false });
-          const faces = ['curious', 'thinking', 'focused'];
-          for (let n = 0; n < 3; n++) {
-            stand(q, 1.0, p.x, p.y, 1, (u) => ({ p: { ...BASE, ...stomp(u, 0.1) }, hl: 'mission-1', fire: u > 0.35 ? { key: `edu${n}`, ev: 'buddy:mission', detail: 1 } : null, expr: faces[n], look: [0.6, 1.3] }));
-          }
-          stand(q, 2.0, p.x, p.y, 1, (u) => ({ hl: 'mission-1', bulb: u < 1.7 ? ease(u / 0.4) : 0, expr: u < 0.5 ? 'wow' : 'joy', look: [0, -1.3], bubble: u > 0.9 ? ['idea'] : null }));
-          // impegno civico: il mondo diventa una persona, e lui la saluta
-          p = jump(q, p, { x: ic[2].cx, y: ic[2].t }, { r: 14, roll: false });
-          stand(q, 0.9, p.x, p.y, 1, (u) => ({ p: { ...BASE, ...stomp(u, 0.15) }, hl: 'mission-2', fire: u > 0.4 ? { key: 'civic', ev: 'buddy:mission', detail: 2 } : null, expr: 'determined', look: [0.6, 1.3] }));
-          const side = { x: tl[2] ? tl[2].l + tl[2].w * 0.7 : p.x + 80 * K, y: tl[2] ? tl[2].cap : p.y + 60 * K };
-          p = jump(q, p, side, { r: 12, roll: false });
-          stand(q, 2.4, p.x, p.y, -1, (u, k, s) => ({ ikR: waveHand(s), hl: 'mission-2', expr: 'joy', lookAt: [ic[2].cx, ic[2].cy], bubble: u > 1.2 ? ['people'] : null }));
-          return p;
+          const ic = R('mission-icon-0');
+          stand(q, 0.5, a.x, a.y, 1, { hl: 'mission-0', expr: 'curious', look: [0.6, 1.3] });
+          stand(q, 1.0, a.x, a.y, 1, (u) => ({ p: { ...BASE, ...stomp(u, 0.05), ...stomp(u, 0.5) }, hl: 'mission-0', fire: u > 0.75 ? { key: 'rocket', ev: 'buddy:mission', detail: 0 } : null, expr: 'determined', look: [0.6, 1.3] }));
+          // il razzo si carica sotto i suoi piedi: si ripara, poi esulta guardandolo partire
+          stand(q, 1.1, a.x, a.y, 1, (u, k, s) => ({ x: a.x + Math.sin(s * 60) * 0.6 * K, p: { ...P.land, shL: 165, elL: 120, shR: 160, elR: 125, head: 10 }, w: 16, hl: 'mission-0', expr: 'wow', look: [0.3, 1.2] }));
+          const sky = [ic.r + 60 * K, ic.t - 80 * K];
+          stand(q, 1.9, a.x, a.y, 1, (u, k, s) => ({ p: { ...P.idle(s), ...P.cheer }, lift: Math.abs(Math.sin(u * Math.PI * 2.4)) * 5 * K, hl: 'mission-0', expr: 'joy', lookAt: sky }));
+          return { ...a, f: 1 };
         },
       },
-      { // 5 — i progetti: bussola e barca
-        anchor: 'project-0', mode: 'zip',
+      { // 5 — missione 2: formazione, dal cappello alla lampadina
+        anchor: 'mission-1', mode: 'auto',
+        entry() { const r = R('mission-icon-1'); return r && { x: r.cx, y: r.t, f: 1 }; },
+        build(q, p) {
+          const faces = ['curious', 'thinking', 'focused'];
+          for (let n = 0; n < 3; n++) stand(q, 0.8, p.x, p.y, 1, (u) => ({ p: { ...BASE, ...stomp(u, 0.08) }, hl: 'mission-1', fire: u > 0.3 ? { key: `edu${n}`, ev: 'buddy:mission', detail: 1 } : null, expr: faces[n], look: [0.6, 1.3] }));
+          stand(q, 1.8, p.x, p.y, 1, (u) => ({ hl: 'mission-1', bulb: u < 1.5 ? ease(u / 0.35) : 0, expr: u < 0.4 ? 'wow' : 'joy', look: [0, -1.3], bubble: u > 0.7 ? ['idea'] : null }));
+          return { ...p, f: 1 };
+        },
+      },
+      { // 6 — missione 3: il mondo diventa una persona, e lui la saluta
+        anchor: 'mission-2', mode: 'auto',
+        entry() { const r = R('mission-icon-2'); return r && { x: r.cx, y: r.t, f: 1 }; },
+        build(q, p) {
+          stand(q, 0.8, p.x, p.y, 1, (u) => ({ p: { ...BASE, ...stomp(u, 0.1) }, hl: 'mission-2', fire: u > 0.35 ? { key: 'civic', ev: 'buddy:mission', detail: 2 } : null, expr: 'determined', look: [0.6, 1.3] }));
+          stand(q, 2.0, p.x, p.y, 1, (u, k, s) => ({ ikR: u > 0.5 ? waveHand(s) : null, hl: 'mission-2', expr: u < 0.5 ? 'wow' : 'joy', look: u < 0.8 ? [0.4, 1.3] : [0, 0.2] }));
+          return { ...p, f: 1 };
+        },
+      },
+      { // 7 — progetto 1: la bussola
+        anchor: 'project-0', mode: 'rope',
         entry() { const c = R('project-0'), i = R('project-icon-0'); return c && i && { x: i.cx, y: c.t, f: 1 }; },
         build(q, a) {
-          const c1 = R('project-1'), i0 = R('project-icon-0'), i1 = R('project-icon-1');
+          const i0 = R('project-icon-0');
           const far = (d) => [a.x + d * 400 * K, a.y - 20 * K];
-          stand(q, 4.4, a.x, a.y, 1, (u) => {
-            const f = u < 1.2 ? 1 : u < 2.4 ? -1 : 1;
-            return { f, p: { ...BASE, torso: 8, head: -4 }, ikR: u < 2.9 ? { rel: 'head', x: 3.2, y: -4.4 } : u > 3.2 ? { world: far(1) } : null, hl: 'project-0', expr: u < 2.6 ? 'focused' : u < 3.2 ? 'wow' : 'determined', lookAt: u < 2.4 ? far(f) : u < 3.0 ? [i0.cx, i0.cy] : far(1), bubble: u > 3.3 ? ['idea'] : null };
+          stand(q, 3.6, a.x, a.y, 1, (u) => {
+            const f = u < 1 ? 1 : u < 2 ? -1 : 1;
+            return { f, p: { ...BASE, torso: 8, head: -4 }, ikR: u < 2.4 ? { rel: 'head', x: 3.2, y: -4.4 } : u > 2.7 ? { world: far(1) } : null, hl: 'project-0', expr: u < 2.1 ? 'focused' : u < 2.7 ? 'wow' : 'determined', lookAt: u < 2 ? far(f) : u < 2.5 ? [i0.cx, i0.cy] : far(1) };
           });
-          let p = jump(q, a, { x: i1.cx, y: c1.t }, {});
-          const ledge = p.y;
-          stand(q, 0.8, p.x, p.y, 1, (u, k) => ({ sit: true, sitK: ease(k), y: ledge, p: P.sit(0), w: 8, hl: 'project-1', expr: 'happy', look: [1, 0.8] }));
-          stand(q, 4.0, p.x, p.y, 1, (u, k, s) => ({ sit: true, sitK: 1, y: ledge, rot: Math.sin(s * 2) * 4, p: { ...P.sit(Math.sin(s * 2) * 10), shR: 50 + Math.sin(s * 3.4) * 32, elR: 40 + Math.cos(s * 3.4) * 26, shL: 40 + Math.sin(s * 3.4) * 30, elL: 46 + Math.cos(s * 3.4) * 24 }, w: 14, oar: true, hl: 'project-1', expr: 'joy', look: [1, Math.sin(s) * 0.4], bubble: u > 0.8 ? ['boat', 'heart'] : null }));
-          stand(q, 0.8, p.x, p.y, 1, (u, k) => ({ sit: true, sitK: 1 - ease(k), y: ledge, p: P.idle(0), w: 8, hl: 'project-1', expr: 'happy', look: [0.6, 0] }));
-          stand(q, 1.6, p.x, p.y, 1, () => ({ p: P.stand, ikR: { rel: 'sh', x: 1.6, y: 3.2 }, hl: 'project-1', expr: 'proud', look: [0.2, 0.1] }));
-          return p;
+          return { ...a, f: 1 };
         },
       },
-      { // 6 — partner: bussa sulle schede "Coming soon", indica "Contattaci", saluto militare, sparisce
+      { // 8 — progetto 2: rema seduto sulla barca
+        anchor: 'project-1', mode: 'auto',
+        entry() { const b = boatSeat(); return b && { x: b.x, y: b.y, f: 1 }; },
+        build(q, p) {
+          const seat0 = { x: p.x, y: p.y };
+          const inBoat = (ex) => (u, k, s) => { const b = boatSeat() || seat0; return { x: b.x, ground: b.y, f: 1, hl: 'project-1', ...ex(u, k, s, b) }; };
+          q.add(0.6, inBoat((u, k, s, b) => ({ sit: true, sitK: ease(k), rot: b.rot, p: P.sit(0), w: 10, expr: 'happy', look: [1, 0.8] })));
+          q.add(4.0, inBoat((u, k, s, b) => ({ sit: true, sitK: 1, rot: b.rot, p: { ...P.sit(4), shR: 50 + Math.sin(s * 3.6) * 32, elR: 40 + Math.cos(s * 3.6) * 26, shL: 40 + Math.sin(s * 3.6) * 30, elL: 46 + Math.cos(s * 3.6) * 24, torso: -4 + Math.sin(s * 3.6) * 8 }, w: 14, oar: true, expr: 'joy', look: [u < 2 ? 1 : 0, Math.sin(s) * 0.3] })));
+          q.add(0.6, inBoat((u, k, s, b) => ({ sit: true, sitK: 1 - ease(k), rot: b.rot, p: P.idle(s), w: 10, expr: 'happy', look: [0.6, 0] })));
+          q.add(1.4, inBoat((u, k, s, b) => ({ rot: b.rot, p: P.stand, ikR: heart, expr: 'proud', look: [0.2, 0.1] })));
+          return { ...seat0, f: 1 };
+        },
+      },
+      { // 9 — partner: bussa sulle schede "Coming soon", indica "Contattaci", saluto militare, sparisce
         anchor: 'partner-0', mode: 'umbrella',
         entry() { const c = R('partner-0'); return c && { x: c.l + c.w * 0.5, y: c.t, f: 1 }; },
         build(q, a) {
           const c0 = R('partner-0'), c1 = R('partner-1'), cta = lines('partners-cta')[0];
-          stand(q, 0.6, a.x, a.y, 1, { expr: 'curious', look: [0.6, 1.2] });
-          stand(q, 1.4, a.x, a.y, 1, (u) => ({ p: { ...BASE, ...stomp(u, 0.1), ...stomp(u, 0.65) }, hl: 'partner-0', ripple: [c0.cx, c0.cy], expr: 'curious', look: [0.6, 1.3] }));
-          stand(q, 1.5, a.x, a.y, 1, () => ({ p: { ...BASE, torso: 40, head: 14 }, w: 9, ikR: { rel: 'head', x: 3.2, y: -4.4 }, hl: 'partner-0', expr: 'curious', lookAt: [c0.cx, c0.cy] }));
-          stand(q, 1.6, a.x, a.y, 1, (u, k, s) => ({ p: { ...P.idle(s), ...P.shrug }, expr: 'shrug', look: [0, 0.1] }));
+          stand(q, 1.2, a.x, a.y, 1, (u) => ({ p: { ...BASE, ...stomp(u, 0.1), ...stomp(u, 0.55) }, hl: 'partner-0', ripple: [c0.cx, c0.cy], expr: 'curious', look: [0.6, 1.3] }));
+          stand(q, 1.2, a.x, a.y, 1, () => ({ p: { ...BASE, torso: 40, head: 14 }, w: 10, ikR: { rel: 'head', x: 3.2, y: -4.4 }, hl: 'partner-0', expr: 'curious', lookAt: [c0.cx, c0.cy] }));
+          stand(q, 1.3, a.x, a.y, 1, (u, k, s) => ({ p: { ...P.idle(s), ...P.shrug }, expr: 'shrug', look: [0, 0.1] }));
           let p = a;
           if (c1 && Math.abs(c1.t - c0.t) < 10) {
-            p = jump(q, a, { x: c1.l + c1.w * 0.5, y: c1.t }, { r: 12, roll: false });
-            stand(q, 1.2, p.x, p.y, 1, (u) => ({ p: { ...BASE, ...stomp(u, 0.15) }, hl: 'partner-1', ripple: [c1.cx, c1.cy], expr: 'happy', look: [0.6, 1.3] }));
-            stand(q, 1.0, p.x, p.y, 1, { expr: 'happy', look: [0, 0.1] });
+            p = move(q, a, { x: c1.l + c1.w * 0.5, y: c1.t }, 'rope');
+            stand(q, 1.0, p.x, p.y, 1, (u) => ({ p: { ...BASE, ...stomp(u, 0.12) }, hl: 'partner-1', ripple: [c1.cx, c1.cy], expr: 'happy', look: [0.6, 1.3] }));
           }
           if (cta) {
             const t = { x: cta.l + cta.w * 0.5, y: cta.cap - 2 * K };
-            p = jump(q, p, t, {});
-            stand(q, 2.8, t.x, t.y, 1, (u, k, s) => ({ p: u < 1.4 ? { ...P.idle(s), torso: 14, head: 10 } : { ...P.idle(s), ...P.tada }, ikR: u < 1.4 ? { world: [cta.cx, cta.cy + cta.fs * 0.2] } : null, expr: 'joy', lookAt: u < 1.4 ? [cta.cx, cta.cy] : viewer(), bubble: u > 1.0 ? ['people', 'heart'] : null }));
+            p = move(q, p, t);
+            stand(q, 2.3, t.x, t.y, 1, (u, k, s) => ({ p: u < 1.1 ? { ...P.idle(s), torso: 14, head: 10 } : { ...P.idle(s), ...P.tada }, ikR: u < 1.1 ? { world: [cta.cx, cta.cy + cta.fs * 0.2] } : null, expr: 'joy', lookAt: u < 1.1 ? [cta.cx, cta.cy] : viewer() }));
           }
           // saluto militare, contento, e via col teletrasporto
-          q.add(0.35, (u, k, s) => ({ x: p.x, ground: p.y, f: 1, p: P.stand, w: 12, lift: Math.sin(k * Math.PI) * 3 * K, expr: 'happy', look: [0, 0.1] }));
-          q.add(1.9, () => ({ x: p.x, ground: p.y, f: 1, p: P.stand, ikR: { rel: 'head', x: 4.4, y: -3.4 }, w: 20, expr: 'proud', look: [0, 0.1] }));
-          q.add(0.4, () => ({ x: p.x, ground: p.y, f: 1, p: P.stand, w: 12, expr: 'joy', look: [0, 0.1] }));
+          q.add(0.3, (u, k) => ({ x: p.x, ground: p.y, f: 1, p: P.stand, w: 14, lift: Math.sin(k * Math.PI) * 3 * K, expr: 'happy', look: [0, 0.1] }));
+          q.add(1.7, () => ({ x: p.x, ground: p.y, f: 1, p: P.stand, ikR: { rel: 'head', x: 4.4, y: -3.4 }, w: 22, expr: 'proud', look: [0, 0.1] }));
+          q.add(0.35, () => ({ x: p.x, ground: p.y, f: 1, p: P.stand, w: 14, expr: 'joy', look: [0, 0.1] }));
           beamOut(q, p, 1);
           q.add(0.2, () => ({ gone: true, finished: true }));
           return null;
@@ -462,32 +484,37 @@ export default function HomeBuddy() {
     ];
 
     // ---------- regia: segue lo scorrimento ----------
-    let act = -1, run = null, pos = null, waitFrom = 0, pending = null, done = false;
-    const triggered = (i) => { const el = $(ACTS[i].anchor); if (!el) return false; const r = el.getBoundingClientRect(); return r.top < VH() * 0.62 && r.bottom > VH() * 0.1; };
-    // la prossima sezione in ordine; se il visitatore l'ha già superata si salta (col teletrasporto) a quella che sta guardando
-    const passed = (i) => { const el = $(ACTS[i].anchor); if (!el) return true; return el.getBoundingClientRect().bottom < VH() * 0.1; };
-    const furthest = () => { for (let i = act + 1; i < ACTS.length; i++) { if (passed(i)) continue; return triggered(i) ? i : -1; } return -1; };
+    let act = -1, run = null, pos = null, waitFrom = 0, pending = null, done = false, lastXY = null, offSince = null, grace = 0;
+    const anchorRect = (i) => { const el = $(ACTS[i].anchor); return el ? el.getBoundingClientRect() : null; };
+    const passed = (i) => { const r = anchorRect(i); return !r || r.bottom < VH() * 0.1; };
+    const nextAct = () => { for (let i = act + 1; i < ACTS.length; i++) if (!passed(i)) return i; return -1; };
     function startAct(i, s) {
       const entry = ACTS[i].entry();
       if (!entry) { act = i; return; }
       const q = seq();
-      const mode = act < 0 || !pos || i > act + 1 ? 'teleport' : ACTS[i].mode;
-      const arrived = travel(q, mode, act < 0 ? null : pos, entry);
+      let arrived = entry;
+      if (!(i === 0 && act < 0)) {
+        const from = act < 0 ? null : (lastXY ? { x: lastXY[0], y: lastXY[1], f: pos?.f ?? 1 } : pos);
+        arrived = move(q, from, entry, i > act + 1 ? 'teleport' : ACTS[i].mode);
+      }
       const exit = ACTS[i].build(q, arrived);
-      act = i; run = { q, s0: s }; pos = exit;
+      act = i; run = { q, s0: s }; pos = exit; lastXY = null; offSince = null; grace = s + 0.8;
       if (e.svg) e.svg.dataset.state = `act-${i}`;
     }
     function waitState(u, s) {
-      const c = u % 10;
-      const nextBelow = act + 1 < ACTS.length;
-      if (nextBelow && c > 3 && c < 5.6) return { x: pos.x, ground: pos.y, f: pos.f, p: P.idle(s), ikR: { rel: 'hip', x: 9, y: 10 }, expr: 'happy', look: [0.5, 1.2], bubble: ['down'] };
-      if (c > 8 && c < 9.4 && u > 12) return { x: pos.x, ground: pos.y, f: pos.f, p: P.idle(s), ikR: { rel: 'head', x: 2, y: 6 }, expr: 'yawn', look: [0, -0.4] };
+      const c = u % 9;
+      if (act + 1 < ACTS.length && c > 3 && c < 5) return { x: pos.x, ground: pos.y, f: pos.f, p: P.idle(s), ikR: { rel: 'hip', x: 9, y: 10 }, expr: 'happy', look: [0.5, 1.2] };
       const pts = [viewer(), [pos.x + 300 * pos.f, pos.y + 200], [pos.x - 200 * pos.f, pos.y - 120], viewer()];
-      return { x: pos.x, ground: pos.y, f: pos.f, p: { ...P.idle(s), hipR: c > 6 && c < 8 ? Math.max(0, Math.sin(s * 9)) * 10 : BASE.hipR }, expr: c < 2 ? 'happy' : 'neutral', lookAt: pts[Math.floor(c / 2.5) % pts.length] };
+      return { x: pos.x, ground: pos.y, f: pos.f, p: { ...P.idle(s), hipR: c > 6 && c < 7.6 ? Math.max(0, Math.sin(s * 9)) * 10 : BASE.hipR }, expr: c < 2 ? 'happy' : 'neutral', lookAt: pts[Math.floor(c / 2.25) % pts.length] };
     }
     function scene(s) {
+      // appena l'omino esce dallo schermo verso l'alto, passa subito alla sezione che si sta guardando
+      const j = nextAct();
+      const off = lastXY && lastXY[1] < window.scrollY + 20 && s > grace;
+      if (off) { if (offSince == null) offSince = s; } else offSince = null;
+      if (j >= 0 && offSince != null && s - offSince > 0.25) { const r = anchorRect(j); if (r && r.top < VH() * 0.95) { startAct(j, s); return scene(s); } }
       if (run) {
-        const u = s - run.s0;
+        const u = (s - run.s0) * SP;
         if (u < run.q.T) {
           const S = run.q.S;
           let lo = 0, hi = S.length - 1;
@@ -498,15 +525,17 @@ export default function HomeBuddy() {
         run = null; waitFrom = s;
         if (act === ACTS.length - 1) { done = true; return { gone: true, finished: true }; }
       }
-      // aspetta che il visitatore arrivi alla prossima sezione
-      const j = furthest();
-      if (j > act) {
-        if (pending == null) pending = { j, at: s + 0.75 };
-        else if (s >= pending.at) { const jj = furthest(); pending = null; if (jj > act) { startAct(jj, s); return scene(s); } }
-      } else pending = null;
+      if (j >= 0) {
+        const r = anchorRect(j);
+        if (r && r.top < VH() * 0.72) {
+          if (pending == null) pending = s + 0.25;
+          else if (s >= pending) { pending = null; startAct(j, s); return scene(s); }
+        } else pending = null;
+      }
       if (e.svg && e.svg.dataset.state !== `wait-${act}`) e.svg.dataset.state = `wait-${act}`;
       return pos ? waitState(s - waitFrom, s) : { gone: true };
     }
+
 
     // ---------- stato fluido dello scheletro ----------
     const cur = { ...BASE }, vel = {}; for (const k of KEYS) vel[k] = 0;
@@ -537,6 +566,10 @@ export default function HomeBuddy() {
     const smooth = (v, t, dt, r) => v + (t - v) * Math.min(1, dt * r);
 
     function draw(st, s, dt) {
+      const menuOpen = !!document.querySelector('[data-mobile-menu]');
+      if (e.svg) e.svg.style.opacity = menuOpen ? '0' : '1';
+      if (!st.gone && st.x != null) lastXY = [st.x, st.ground];
+      set(e.clip, { x: st.clip != null ? st.clip : -1e6 });
       set(e.world, { transform: `translate(${(-window.scrollX).toFixed(1)} ${(-window.scrollY).toFixed(1)})` });
       // eventi verso il sito
       if (st.fire && !fired.has(st.fire.key)) { fired.add(st.fire.key); window.dispatchEvent(new CustomEvent(st.fire.ev, { detail: st.fire.detail })); }
@@ -668,9 +701,9 @@ export default function HomeBuddy() {
       if (bulbK > 0.01) set(e.bulb, { opacity: bulbK.toFixed(2), transform: `translate(${headTop[0].toFixed(2)} ${(headTop[1] - 8 - bulbK * 2).toFixed(2)})` });
       else set(e.bulb, { opacity: 0 });
       if (st.oar) {
-        const hnd = sk.handR, dir = [Math.sin((50 + Math.sin(s * 3.4) * 30) * D), Math.cos((50 + Math.sin(s * 3.4) * 30) * D)];
-        set(e.oar, { opacity: 1, d: `M${(hnd[0] - dir[0] * 4).toFixed(2)} ${(hnd[1] - dir[1] * 4).toFixed(2)} L${(hnd[0] + dir[0] * 20).toFixed(2)} ${(hnd[1] + dir[1] * 20).toFixed(2)}` });
-        set(e.blade, { opacity: 1, cx: (hnd[0] + dir[0] * 20).toFixed(2), cy: (hnd[1] + dir[1] * 20).toFixed(2) });
+        const oa = 32 + Math.sin(s * 3.6) * 20, hnd = sk.handR, dir = [Math.sin(oa * D) * Math.sign(f), Math.cos(oa * D)];
+        set(e.oar, { opacity: 1, d: `M${(hnd[0] - dir[0] * 4).toFixed(2)} ${(hnd[1] - dir[1] * 4).toFixed(2)} L${(hnd[0] + dir[0] * 17).toFixed(2)} ${(hnd[1] + dir[1] * 17).toFixed(2)}` });
+        set(e.blade, { opacity: 1, cx: (hnd[0] + dir[0] * 17).toFixed(2), cy: (hnd[1] + dir[1] * 17).toFixed(2), transform: `rotate(${(-oa * Math.sign(f)).toFixed(1)} ${(hnd[0] + dir[0] * 17).toFixed(2)} ${(hnd[1] + dir[1] * 17).toFixed(2)})` });
       } else { set(e.oar, { opacity: 0 }); set(e.blade, { opacity: 0 }); }
       orbitK = smooth(orbitK, st.orbit ? 1 : 0, dt, 4);
       for (let i = 0; i < 6; i++) {
@@ -706,10 +739,10 @@ export default function HomeBuddy() {
     // parte dopo l'entrata del titolo; se il visitatore ha già scorso, entra direttamente nella sezione giusta
     const start = setTimeout(() => {
       t0 = performance.now(); last = t0;
-      const j = Math.max(0, furthest());
+      const j = window.scrollY < 80 ? 0 : Math.max(0, nextAct());
       startAct(j, 0);
       raf = requestAnimationFrame(frame);
-    }, 2300);
+    }, 900);
     return () => { clearTimeout(start); cancelAnimationFrame(raf); setHL(null); };
   }, []);
 
@@ -717,9 +750,10 @@ export default function HomeBuddy() {
   const r = (k) => (el) => { els.current[k] = el; };
   const cloud = [[-8, 1, 6], [-2, -4, 7], [6, -3, 6.5], [10, 2, 5], [1, 4, 6.2], [-11, -2, 4.5]];
   return createPortal(
-    <svg ref={r('svg')} aria-hidden="true" style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 30, overflow: 'visible' }}>
+    <svg ref={r('svg')} aria-hidden="true" style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 55, overflow: 'visible' }}>
       <defs>
         <linearGradient id="hbBeam" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stopColor="#67e8f9" stopOpacity="0.75" /><stop offset="60%" stopColor="#a78bfa" stopOpacity="0.3" /><stop offset="100%" stopColor="#a78bfa" stopOpacity="0" /></linearGradient>
+        <clipPath id="hbClip" clipPathUnits="userSpaceOnUse"><rect ref={r('clip')} x="-1000000" y="-1000000" width="3000000" height="3000000" /></clipPath>
         <radialGradient id="hbBulbGlow"><stop offset="0%" stopColor="#ffe27a" stopOpacity="1" /><stop offset="100%" stopColor="#ffe27a" stopOpacity="0" /></radialGradient>
       </defs>
       <g ref={r('world')}>
@@ -736,6 +770,7 @@ export default function HomeBuddy() {
           {Array.from({ length: 9 }, (_, i) => <circle key={i} ref={r(`spark${i}`)} r={i % 3 === 0 ? 1.1 : 0.7} fill={i % 2 ? '#a78bfa' : '#22d3ee'} />)}
         </g>
 
+        <g clipPath="url(#hbClip)">
         <g ref={r('fig')} data-hb="fig" opacity="0">
           {/* paracadute */}
           <path ref={r('strings')} fill="none" stroke="#9aa3b5" strokeWidth="0.35" opacity="0" />
@@ -826,6 +861,7 @@ export default function HomeBuddy() {
               <path d="M-9 6.2 Q-6.75 5 -4.5 6.2 T0 6.2 T4.5 6.2 T9 6.2" fill="none" stroke="#4a90e2" strokeWidth="0.6" />
             </g>
           </g>
+        </g>
         </g>
       </g>
     </svg>,

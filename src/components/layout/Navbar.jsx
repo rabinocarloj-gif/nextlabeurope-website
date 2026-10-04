@@ -121,7 +121,7 @@ export default function Navbar({ lang, targetLang, setLang, fadeStyle }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
             ref={menuRef}
-            className="fixed inset-0 z-40 overflow-hidden flex flex-col"
+            data-mobile-menu="" className="fixed inset-0 z-40 overflow-hidden flex flex-col"
             style={{ backgroundColor: '#fcfcfc' }}
           >
             <MenuBuddy containerRef={menuRef} />
