@@ -234,3 +234,17 @@
 @media (prefers-reduced-motion: reduce) {
   .group:hover .cmp-needle, .group:hover .boat-bob, .group:hover .sea-flow, .rocket-charging, .ash, .bulb-on { animation: none; }
 }
+
+/* Omino della home: evidenzia l'elemento con cui sta interagendo (come al passaggio del mouse) */
+.buddy-on { box-shadow: 0 24px 50px -30px rgba(26,79,196,0.45); }
+.buddy-on.card-glow::before { background: linear-gradient(135deg, #1a4fc4, #6aa6f0 50%, rgba(242,201,76,0.8)); }
+.buddy-on [data-hl] { opacity: 1; }
+.buddy-on [data-hl-icon] { color: #ffffff; }
+.buddy-on h3 { color: #1a4fc4; }
+.buddy-on .cmp-needle { animation: needle-seek 2.2s cubic-bezier(0.45, 0, 0.25, 1); }
+.buddy-on .boat-bob { animation: boat-bob 1.8s ease-in-out infinite; }
+.buddy-on .sea-flow { animation: sea-flow 1.1s linear infinite; }
+[data-buddy^="partner-"].buddy-on > span:first-child { opacity: 1; left: 120%; }
+[data-buddy^="team-"].buddy-on > span:first-child { opacity: 1; }
+.btn-glow.buddy-on { background-position: 100% 0; box-shadow: 0 10px 30px -8px rgba(26,79,196,0.55), 0 0 0 4px rgba(74,144,226,0.12); }
+[data-buddy^="pillar-"].buddy-on { box-shadow: none; }

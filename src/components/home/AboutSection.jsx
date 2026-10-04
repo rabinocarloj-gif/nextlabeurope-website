@@ -96,10 +96,10 @@ export default function AboutSection({ lang, aboutImage }) {
               className="font-mono text-[10px] uppercase tracking-[0.4em] mb-8" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
               {t.label}
             </motion.p>
-            <motion.h2 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            <motion.h2 data-buddy="about-title" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
               className="font-heading font-extrabold text-4xl lg:text-5xl leading-tight mb-8"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              {t.title}<span className="text-blue-gradient">{t.titleAccent}</span>
+              {t.title}<span data-buddy="about-accent" className="text-blue-gradient">{t.titleAccent}</span>
             </motion.h2>
             <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
               transition={{ delay: 0.2 }} className="text-lg leading-relaxed" style={{ color: '#6b7280' }}>
@@ -110,17 +110,17 @@ export default function AboutSection({ lang, aboutImage }) {
               <img src={aboutImage} alt="Team" className="w-full h-64 object-cover" />
             </motion.div>
           </div>
-          <div className="space-y-0">
+          <div className="space-y-0" data-buddy="pillars">
             {t.pillars.map((pillar, i) => (
-              <motion.div key={pillar.num} initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }}
+              <motion.div key={pillar.num} data-buddy={`pillar-${i}`} initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.15 }}
                 className="relative group py-9 first:pt-0 flex gap-6 items-start" style={{ borderBottom: '1px solid #ececf1' }}>
-                <div className="relative shrink-0 w-14 h-14 mt-[14px] rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:-translate-y-1"
+                <div data-buddy={`pillar-icon-${i}`} className="relative shrink-0 w-14 h-14 mt-[14px] rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:-translate-y-1"
                   style={{ background: 'linear-gradient(140deg, #eff4ff 0%, #ffffff 100%)', border: '1px solid rgba(26,79,196,0.14)', boxShadow: '0 10px 24px -14px rgba(26,79,196,0.45)' }}>
-                  <span aria-hidden="true" className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  <span aria-hidden="true" data-hl="" className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                     style={{ background: 'linear-gradient(140deg, #1a4fc4 0%, #4a90e2 100%)' }} />
                   <svg viewBox="0 0 24 24" width="26" height="26"
-                    className="relative transition-colors duration-500 text-[#1a4fc4] group-hover:text-white">
+                    data-hl-icon="" className="relative transition-colors duration-500 text-[#1a4fc4] group-hover:text-white">
                     {PILLAR_ICONS[i]}
                   </svg>
                 </div>
@@ -151,11 +151,11 @@ export default function AboutSection({ lang, aboutImage }) {
             </div>
           </div>
 
-          <div ref={scrollerRef}
+          <div ref={scrollerRef} data-buddy="team-row"
             className="flex gap-6 overflow-x-auto pt-2 pb-6 -mx-6 px-6 lg:mx-0 lg:px-0"
             style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none' }}>
             {team.map((person, i) => (
-              <motion.div key={person.name} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
+              <motion.div key={person.name} data-buddy={`team-${i}`} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ delay: i * 0.12, duration: 0.6 }}
                 className="card-glow group relative shrink-0 w-[300px] lg:w-[340px] p-8 rounded-3xl bg-white overflow-hidden transition-all duration-500 hover:-translate-y-1.5"
                 style={{ border: '1px solid #ececf1', scrollSnapAlign: 'start', boxShadow: '0 1px 2px rgba(15,15,15,0.03)' }}>
@@ -164,7 +164,7 @@ export default function AboutSection({ lang, aboutImage }) {
                 <p className="relative font-mono text-[10px] uppercase tracking-[0.35em] mb-5" style={{ color: '#1a4fc4', fontFamily: "'JetBrains Mono', monospace" }}>
                   {person.role[lang]}
                 </p>
-                <h4 className="relative font-heading font-bold text-xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <h4 data-buddy={`team-name-${i}`} className="relative font-heading font-bold text-xl mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   {person.name}
                 </h4>
                 <span aria-hidden="true" className="relative block h-px w-10 mb-4 transition-all duration-500 group-hover:w-24"
@@ -179,7 +179,7 @@ export default function AboutSection({ lang, aboutImage }) {
             <button onClick={() => scrollByCard(-1)} aria-label="Previous"
               className="w-11 h-11 rounded-full flex items-center justify-center bg-white transition-all duration-300 hover:text-white hover:bg-[#1a4fc4] hover:border-[#1a4fc4] hover:shadow-[0_8px_20px_-8px_rgba(26,79,196,0.6)]"
               style={{ border: '1.5px solid #e5e7eb' }}>‹</button>
-            <button onClick={() => scrollByCard(1)} aria-label="Next"
+            <button onClick={() => scrollByCard(1)} aria-label="Next" data-buddy="team-next"
               className="w-11 h-11 rounded-full flex items-center justify-center bg-white transition-all duration-300 hover:text-white hover:bg-[#1a4fc4] hover:border-[#1a4fc4] hover:shadow-[0_8px_20px_-8px_rgba(26,79,196,0.6)]"
               style={{ border: '1.5px solid #e5e7eb' }}>›</button>
           </div>

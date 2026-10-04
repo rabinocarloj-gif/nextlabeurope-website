@@ -127,21 +127,27 @@ const CIVIC_STEPS = [{ Icon: Globe, color: '#1a4fc4' }, { Icon: UserRound, color
 
 function MissionCard({ card, i }) {
   const [hovers, setHovers] = useState(0);
+  // l'omino della home "preme" l'icona: stesso effetto del passaggio del mouse
+  React.useEffect(() => {
+    const onBuddy = (e) => { if (e.detail === i) setHovers((h) => h + 1); };
+    window.addEventListener('buddy:mission', onBuddy);
+    return () => window.removeEventListener('buddy:mission', onBuddy);
+  }, [i]);
   return (
     <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }} transition={{ delay: i * 0.15 }}
-      onMouseEnter={() => setHovers((h) => h + 1)}
+      onMouseEnter={() => setHovers((h) => h + 1)} data-buddy={`mission-${i}`}
       className="card-glow group bg-white p-10 rounded-2xl transition-all duration-500 cursor-default hover:-translate-y-1.5 hover:shadow-[0_24px_50px_-30px_rgba(26,79,196,0.4)]"
       style={{ border: '1px solid #f3f4f6' }}>
       <div className="mb-8">
-        <div className="relative w-12 h-12 flex items-center justify-center rounded-xl overflow-hidden transition-all duration-300 group-hover:shadow-[0_8px_20px_-10px_rgba(26,79,196,0.6)]"
+        <div data-buddy={`mission-icon-${i}`} className="relative w-12 h-12 flex items-center justify-center rounded-xl overflow-hidden transition-all duration-300 group-hover:shadow-[0_8px_20px_-10px_rgba(26,79,196,0.6)]"
           style={{ backgroundColor: 'rgba(26,79,196,0.08)' }}>
           {card.kind === 'rocket' && <RocketIcon trigger={hovers} />}
           {card.kind === 'edu' && <CycleIcon step={hovers} steps={EDU_STEPS} />}
           {card.kind === 'civic' && <CycleIcon step={hovers} steps={CIVIC_STEPS} spin />}
         </div>
       </div>
-      <h3 className="font-heading font-extrabold italic text-xl mb-4 transition-colors duration-500 group-hover:text-[#1a4fc4]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#0F0F0F' }}>
+      <h3 data-buddy={`mission-title-${i}`} className="font-heading font-extrabold italic text-xl mb-4 transition-colors duration-500 group-hover:text-[#1a4fc4]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#0F0F0F' }}>
         {card.title}
       </h3>
       <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>{card.desc}</p>

@@ -58,10 +58,18 @@ function EuropeanRing({ sectionRef }) {
       const near = Math.hypot(e.clientX - cx, e.clientY - cy) < r.width * 0.62;
       if (near !== goldRef.current) { goldRef.current = near; setGold(near); if (near) boostUntil.current = performance.now() + 2000; }
     };
+    // l'omino della home accende e fa girare le stelle
+    let buddyTimer;
+    const onBuddy = () => {
+      goldRef.current = true; setGold(true); boostUntil.current = performance.now() + 2200;
+      clearTimeout(buddyTimer);
+      buddyTimer = setTimeout(() => { goldRef.current = false; setGold(false); }, 4200);
+    };
+    window.addEventListener('buddy:ring', onBuddy);
     const onLeave = () => { goldRef.current = false; setGold(false); };
     section.addEventListener('mousemove', onMove);
     section.addEventListener('mouseleave', onLeave);
-    return () => { section.removeEventListener('mousemove', onMove); section.removeEventListener('mouseleave', onLeave); };
+    return () => { section.removeEventListener('mousemove', onMove); section.removeEventListener('mouseleave', onLeave); window.removeEventListener('buddy:ring', onBuddy); clearTimeout(buddyTimer); };
   }, [sectionRef]);
 
   const stars = Array.from({ length: 12 }, (_, i) => {
@@ -79,7 +87,7 @@ function EuropeanRing({ sectionRef }) {
   };
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div ref={wrapRef} className={`${gold ? 'is-gold ' : ''}eu-ring-wrap absolute top-16 -right-16 w-[300px] h-[300px] opacity-25 sm:opacity-40 sm:w-[440px] sm:h-[440px] sm:top-1/2 sm:-translate-y-1/2 sm:-right-20 lg:opacity-90 lg:w-[620px] lg:h-[620px] lg:-right-28`}>
+      <div ref={wrapRef} data-buddy="hero-ring" className={`${gold ? 'is-gold ' : ''}eu-ring-wrap absolute top-16 -right-16 w-[300px] h-[300px] opacity-25 sm:opacity-40 sm:w-[440px] sm:h-[440px] sm:top-1/2 sm:-translate-y-1/2 sm:-right-20 lg:opacity-90 lg:w-[620px] lg:h-[620px] lg:-right-28`}>
         <div className="eu-glow absolute inset-[12%] rounded-full"
           style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.20) 0%, rgba(26,79,196,0.10) 45%, rgba(26,79,196,0) 72%)', filter: 'blur(10px)' }} />
         <div className="eu-glow-gold absolute inset-[6%] rounded-full"
@@ -132,14 +140,14 @@ export default function HeroSection({ lang, heroImage }) {
           </motion.p>
           <div className="space-y-1">
             {[t.title1, t.title2].map((line, i) => (
-              <motion.h1 key={i} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
+              <motion.h1 key={i} data-buddy={`hero-t${i + 1}`} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 + i * 0.15, duration: 0.8 }}
                 className="font-heading font-extrabold leading-[0.95] tracking-tight"
                 style={{ fontSize: 'clamp(2.25rem, 6vw, 5.25rem)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 {line}
               </motion.h1>
             ))}
-            <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }}
+            <motion.h1 data-buddy="hero-t3" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7, duration: 0.8 }}
               className="font-heading font-extrabold leading-[0.95] tracking-tight shimmer-loop italic"
               style={{ fontSize: 'clamp(2.25rem, 6vw, 5.25rem)', fontFamily: "'Plus Jakarta Sans', sans-serif", paddingBottom: '0.14em', paddingRight: '0.12em', marginBottom: '-0.14em', display: 'inline-block' }}>
               {t.title3}
@@ -151,7 +159,7 @@ export default function HeroSection({ lang, heroImage }) {
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }}
             className="mt-10 flex flex-wrap gap-4">
-            <Link to="/contatti?motivo=socio"
+            <Link to="/contatti?motivo=socio" data-buddy="hero-cta"
               className="btn-glow inline-block px-16 py-4 font-heading font-bold text-sm tracking-wide rounded-full text-white shadow-md"
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {t.cta2}

@@ -86,7 +86,7 @@ export default function ProgramsSection({ lang }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
           {projects.map((project, i) => (
-            <motion.article key={project.num} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+            <motion.article key={project.num} data-buddy={`project-${i}`} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} transition={{ delay: i * 0.15, duration: 0.6 }}
               className="card-glow group relative rounded-3xl overflow-hidden bg-white transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_30px_60px_-30px_rgba(26,79,196,0.35)]"
               style={{ border: '1px solid #ececf1' }}>
@@ -94,7 +94,7 @@ export default function ProgramsSection({ lang }) {
                 <div aria-hidden="true" className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(26,79,196,0.12) 1px, transparent 1px)', backgroundSize: '18px 18px', maskImage: 'linear-gradient(to right, transparent, #000 60%)', WebkitMaskImage: 'linear-gradient(to right, transparent, #000 60%)' }} />
                 <div aria-hidden="true" className="absolute -right-16 -top-16 w-64 h-64 rounded-full transition-transform duration-700 group-hover:scale-110"
                   style={{ background: 'radial-gradient(circle, rgba(74,144,226,0.28) 0%, rgba(74,144,226,0) 70%)' }} />
-                <svg viewBox="0 0 64 64" className="absolute right-8 top-1/2 -translate-y-1/2 w-28 h-28 text-[#1a4fc4] opacity-80 transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6">
+                <svg viewBox="0 0 64 64" data-buddy={`project-icon-${i}`} className="absolute right-8 top-1/2 -translate-y-1/2 w-28 h-28 text-[#1a4fc4] opacity-80 transition-transform duration-700 group-hover:scale-110 group-hover:rotate-6">
                   {ICONS[project.icon]}
                 </svg>
                 <div className="absolute left-8 top-8">

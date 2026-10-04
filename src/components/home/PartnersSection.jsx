@@ -37,7 +37,7 @@ export default function PartnersSection({ lang }) {
         </motion.h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
           {[...Array(6)].map((_, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+            <motion.div key={i} data-buddy={`partner-${i}`} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.6 }}
               className="card-glow group relative h-24 rounded-2xl flex items-center justify-center overflow-hidden transition-all duration-500 hover:-translate-y-1"
               style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(26,79,196,0.10)' }}>
@@ -52,7 +52,7 @@ export default function PartnersSection({ lang }) {
         </div>
         <p className="text-center text-sm" style={{ color: '#6b7280' }}>
           {t.note}
-          <Link to="/contatti?motivo=collaborazione" className="text-link font-semibold ml-2" style={{ color: '#1a4fc4' }}>{t.cta}</Link>
+          <Link to="/contatti?motivo=collaborazione" data-buddy="partners-cta" className="text-link font-semibold ml-2" style={{ color: '#1a4fc4' }}>{t.cta}</Link>
         </p>
       </div>
     </section>
