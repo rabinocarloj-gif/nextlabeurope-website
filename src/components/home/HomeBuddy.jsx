@@ -198,48 +198,75 @@ export default function HomeBuddy() {
     const holdChute = (s) => ({ ...P.idle(s), shL: 166, elL: 8, shR: 158, elR: 12 });
     const holdUmb = (s) => ({ ...P.idle(s), shR: 174, elR: 2, shL: 50, elL: 30 });
 
-    // paracadute / ombrello: si apre da fermo, un passo oltre il bordo e giù dondolando (mai salti)
+    // profilo di velocità con accelerazione e frenata indipendenti (a0 = quota di avvio, a1 = quota di frenata)
+    const glide = (t, a0, a1) => {
+      const k = clamp(t, 0, 1), vm = 1 / (1 - a0 / 2 - a1 / 2);
+      if (a0 > 0 && k < a0) return (vm * k * k) / (2 * a0);
+      if (k < 1 - a1) return vm * (k - a0 / 2);
+      return 1 - (vm * (1 - k) * (1 - k)) / (2 * a1);
+    };
+    // paracadute / ombrello: guarda giù, apre, sente la presa del vento, un passo oltre il bordo,
+    // scende accelerando e frenando, prepara le gambe, atterra ammortizzando mentre la vela si affloscia
     function float(q, a, b, um) {
       const f = b.x >= a.x ? 1 : -1;
       const top = topY();
-      let sx, sy;
-      const canopy = (v) => (um ? { umbrella: v } : { chute: v });
-      if (offTop(a) || (a.y < top && b.y - top > 60 * K)) { sx = b.x - f * 46 * K; sy = Math.max(top, Math.min(a.y, b.y - 40 * K)); }
+      let sx, sy, enter = false;
+      const can = (v, ex = {}) => (um ? { umbrella: v, ...ex } : { chute: v, ...ex });
+      const hold = um ? holdUmb : holdChute;
+      if (offTop(a) || (a.y < top && b.y - top > 60 * K)) { enter = true; sx = b.x - f * 46 * K; sy = Math.max(top, Math.min(a.y, b.y - 40 * K)); }
       else {
-        q.add(0.45, (u, k, s) => ({ x: a.x, ground: a.y, f, p: um ? holdUmb(s) : holdChute(s), w: 14, ...canopy(ease(k)), expr: 'joy', look: [0.3, -1] }));
-        q.add(0.32, (u, k, s) => ({ x: lerp(a.x, a.x + f * 10 * K, k), ground: a.y + k * k * 5 * K, f, gait: 'walk', p: um ? holdUmb(s) : holdChute(s), ...canopy(1), expr: 'joy', look: [1, 0.8] }));
-        sx = a.x + f * 10 * K; sy = a.y + 5 * K;
+        q.add(0.4, (u, k, s) => ({ x: a.x, ground: a.y, f, p: { ...P.idle(s), torso: 14, head: 16 }, w: 9, expr: 'curious', lookAt: [b.x, b.y] }));
+        q.add(0.6, (u, k, s) => ({ x: a.x, ground: a.y, f, p: hold(s), w: 11, ...can(easeOut(k / 0.8)), lift: pulse(u, 0.32, 0.28) * 2.5 * K, expr: k < 0.4 ? 'curious' : 'joy', lookAt: [a.x, a.y - 70 * K] }));
+        q.add(0.42, (u, k, s) => ({ x: lerp(a.x, a.x + f * 12 * K, ease(k)), ground: a.y + k * k * 6 * K, f, gait: 'walk', p: hold(s), w: 12, ...can(1), expr: 'joy', look: [1, 1] }));
+        sx = a.x + f * 12 * K; sy = a.y + 6 * K;
       }
-      const dd = clamp((b.y - sy) / ((um ? 120 : 145) * K), 0.9, um ? 3.2 : 2.8);
+      const dd = clamp((b.y - sy) / ((um ? 110 : 135) * K), 1.1, um ? 3.6 : 3.2);
       q.add(dd, (u, k, s) => {
-        const sway = Math.sin(u * (um ? 2.6 : 3)) * (1 - k * k);
-        return { x: lerp(sx, b.x, ease(k)) + sway * 6 * K, ground: lerp(sy, b.y, k), f, rot: sway * (um ? 9 : 6), p: um ? P.umbrella(s) : P.hang(s), w: 12, ...canopy(1), expr: k < 0.6 ? 'joy' : 'happy', lookAt: k < 0.5 ? viewer() : [b.x, b.y + 40] };
+        const p = glide(k, enter ? 0 : 0.18, 0.24);
+        const amp = (1 - k) * (1 - k * 0.5);
+        const sway = Math.sin(u * (um ? 2.4 : 2.9) + 0.6) * amp;
+        const tug = enter ? 0 : Math.sin(clamp(u / 0.45, 0, 1) * Math.PI) * 4 * K; // la vela "prende" l'aria
+        const base = um ? P.umbrella(s) : P.hang(s);
+        const flare = k > 0.78 ? { ...base, hipL: 32, kneeL: -18, hipR: 22, kneeR: -30, torso: -4 } : base;
+        return { x: lerp(sx, b.x, ease(k)) + sway * 7 * K, ground: lerp(sy, b.y, p) - tug, f, rot: sway * (um ? 10 : 7), p: flare, w: k > 0.78 ? 9 : 7, ...can(1), expr: k < 0.7 ? 'joy' : 'focused', lookAt: k < 0.45 ? viewer() : [b.x + f * 10 * K, b.y + 30 * K] };
       });
       const id = ++impactId;
-      q.add(0.32, (u, k, s) => ({ x: b.x, ground: b.y, f, p: P.land, w: 24, impact: id, ...canopy(1 - ease(k)), chuteDrop: um ? 0 : k, expr: 'happy', look: [1, 0.5] }));
-      q.add(0.35, (u, k, s) => ({ x: b.x, ground: b.y, f, p: P.idle(s), w: 12, expr: 'happy', look: [1, 0] }));
+      q.add(0.34, (u, k, s) => ({ x: b.x, ground: b.y, f, p: P.land, w: 22, impact: id, ...can(um ? 1 - 0.5 * ease(k) : 1, um ? {} : { chuteDrop: 0.45 * ease(k) }), expr: 'happy', look: [1, 0.5] }));
+      q.add(0.6, (u, k, s) => ({ x: b.x, ground: b.y, f, p: um ? { ...P.idle(s), shR: lerp(120, -6, ease(k)), elR: 10 } : P.idle(s), w: 9, ...can(um ? 0.5 * (1 - ease(k)) : 1, um ? {} : { chuteDrop: 0.45 + 0.55 * ease(k) }), expr: 'happy', look: [1, 0] }));
       return { ...b, f };
     }
-    // corda: compare un cavo, ci si aggrappa e scivola (anche entrando dall'alto se parte fuori schermo)
+    // corda: compare il cavo, ci si aggrappa con le mani (il corpo pende dalle mani), scivola con
+    // l'inerzia che fa oscillare le gambe, rallenta, si lascia andare e atterra
+    const ZL = localSkeleton({ ...BASE, ...P.zip(0) });
+    const REACH = Math.max(ZL.footL[1], ZL.footR[1]) - (ZL.handL[1] + ZL.handR[1]) / 2;
+    const HANDX = (ZL.handL[0] + ZL.handR[0]) / 2;
     function rope(q, a, b) {
       let f = b.x >= a.x ? 1 : -1;
-      const H = 35 * K, top = topY();
+      const top = topY(), H = (REACH + 3) * K;
       let xs = a.x, ys = a.y;
       const enter = offTop(a);
       if (enter) { xs = b.x - f * Math.max(110 * K, Math.min(260 * K, (b.y - top) * 0.7)); if (xs < window.scrollX + 10) { f = -f; xs = b.x - f * 110 * K; } ys = Math.min(top, b.y - 10 * K); }
-      const A0 = [xs, ys - H], B0 = [b.x, b.y - H], zip = { a: A0, b: B0 };
+      const hx = HANDX * K * f;
+      const A0 = [xs + hx, ys - H], B0 = [b.x + hx, b.y - H], zip = { a: A0, b: B0 };
       if (!enter) {
-        q.add(0.4, (u, k, s) => ({ x: a.x, ground: a.y, f, p: P.idle(s), w: 12, zip, zipK: ease(k), expr: 'curious', lookAt: [lerp(A0[0], B0[0], 0.35), lerp(A0[1], B0[1], 0.35)] }));
-        q.add(0.28, (u, k, s) => ({ x: a.x, ground: a.y - 3 * K * ease(k), f, p: P.zip(s), w: 18, zip, zipK: 1, expr: 'joy', look: [1, -0.6] }));
+        q.add(0.45, (u, k, s) => ({ x: a.x, ground: a.y, f, p: P.idle(s), w: 10, zip, zipK: ease(k), expr: 'curious', lookAt: [lerp(A0[0], B0[0], 0.35 * k), lerp(A0[1], B0[1], 0.35 * k)] }));
+        q.add(0.32, (u, k, s) => ({ x: a.x, ground: a.y, f, p: { ...P.zip(s), hipL: 4, kneeL: -6, hipR: -4, kneeR: -4 }, w: 13, zip, zipK: 1, expr: 'determined', look: [0.4, -1.3] }));
+        q.add(0.2, (u, k, s) => ({ x: a.x, ground: a.y - 3 * K * ease(k), f, p: P.zip(s), w: 16, zip, zipK: 1, expr: 'joy', look: [1, -0.6] }));
       }
-      const ds = clamp(Math.hypot(B0[0] - A0[0], B0[1] - A0[1]) / (360 * K), 0.7, 2.2);
+      const ds = clamp(Math.hypot(B0[0] - A0[0], B0[1] - A0[1]) / (330 * K), 0.8, 2.4);
+      let endRot = 0;
       q.add(ds, (u, k, s) => {
-        const p = enter ? 1 - (1 - k) * (1 - k) : k * k * (3 - 2 * k);
-        return { x: lerp(xs, b.x, p), ground: lerp(ys - 3 * K, b.y - 3 * K, p), f, rot: Math.sin(k * Math.PI) * 7, p: P.zip(s), w: 16, zip, zipK: enter ? 1 : 1, expr: 'joy', lookAt: viewer(), trolley: true };
+        const p = enter ? glide(k, 0, 0.45) : glide(k, 0.35, 0.35);
+        const acc = enter ? (k < 0.55 ? 0 : -1) : (k < 0.35 ? 1 : k < 0.65 ? 0 : -1);
+        const rot = acc * 9 + Math.sin(u * 6) * 2.5 * (1 - k);
+        endRot = rot;
+        const hp = [lerp(A0[0], B0[0], p), lerp(A0[1], B0[1], p)];
+        return { x: hp[0] - hx, ground: hp[1] + H, hangPt: hp, f, rot, p: P.zip(s), w: 12, zip, zipK: 1, expr: 'joy', lookAt: k < 0.6 ? viewer() : [b.x, b.y], trolley: true };
       });
+      q.add(0.16, (u, k, s) => ({ x: b.x, ground: b.y - 3 * K * (1 - k * k), f, rot: endRot * (1 - k), p: { ...P.zip(s), shL: lerp(176, 120, k), shR: lerp(172, 110, k) }, w: 14, zip, zipK: 1, expr: 'joy', look: [1, 0.8] }));
       const id = ++impactId;
-      q.add(0.3, (u, k) => ({ x: b.x, ground: b.y, f, p: P.land, w: 26, impact: id, zip, zipK: 1, zipFade: k, expr: 'happy', look: [1, 0.4] }));
-      q.add(0.3, (u, k, s) => ({ x: b.x, ground: b.y, f, p: P.idle(s), w: 12, expr: 'happy', look: [1, 0] }));
+      q.add(0.32, (u, k) => ({ x: b.x, ground: b.y, f, p: P.land, w: 22, impact: id, zip, zipK: 1, zipFade: k, expr: 'happy', look: [1, 0.4] }));
+      q.add(0.35, (u, k, s) => ({ x: b.x, ground: b.y, f, p: P.idle(s), w: 9, expr: 'happy', look: [1, 0] }));
       return { ...b, f };
     }
     function move(q, a, b, mode = 'auto', opt = {}) {
@@ -541,7 +568,7 @@ export default function HomeBuddy() {
     const cur = { ...BASE }, vel = {}; for (const k of KEYS) vel[k] = 0;
     let fS = 1, fV = 0, fTarget = 1, prevX = null, speed = 0, phase = 0, gaitAmt = 0, curGait = 'walk', hipYPrev = -13;
     const face = { ...FACE.neutral, lx: 0.6, ly: 0 };
-    let nextBlink = 2, blinkUntil = 0, bubbleK = 0, lastImpact = 0, dust = null, chuteK = 0, umbK = 0, bookK = 0, bulbK = 0, orbitK = 0;
+    let lastDrop = 0, nextBlink = 2, blinkUntil = 0, bubbleK = 0, lastImpact = 0, dust = null, chuteK = 0, umbK = 0, bookK = 0, bulbK = 0, orbitK = 0;
     const iconOp = {}; for (const id of ICONS) iconOp[id] = 0;
     const fired = new Set();
     let hlEl = null, hlName = null;
@@ -640,8 +667,13 @@ export default function HomeBuddy() {
       }
       const f = Math.abs(fS) < 0.04 ? (fS < 0 ? -0.04 : 0.04) : fS;
       const rot = st.rot || 0;
-      let hipY;
-      if (st.sit) hipY = lerp(-13, -1, st.sitK ?? 1);
+      let hipY, X = st.x, G = st.ground - (st.lift || 0);
+      if (st.hangPt) {
+        // appeso: il corpo pende dalle mani, che restano sul cavo
+        const pr = skeleton(pose, 0, 0, f, rot);
+        const hxx = (pr.handL[0] + pr.handR[0]) / 2, hyy = (pr.handL[1] + pr.handR[1]) / 2;
+        X = st.hangPt[0] - hxx * K; G = st.hangPt[1]; hipY = -hyy;
+      } else if (st.sit) hipY = lerp(-13, -1, st.sitK ?? 1);
       else {
         const pr = skeleton(pose, 0, 0, f, rot);
         hipY = -Math.max(pr.footL[1], pr.footR[1], pr.kneeL[1], pr.kneeR[1], pr.hip[1], pr.neck[1], pr.headC[1] + LEN.head * 0.92);
@@ -652,13 +684,14 @@ export default function HomeBuddy() {
       set(e.body, { d: [ln(sk.hip, sk.kneeL), ln(sk.kneeL, sk.footL), ln(sk.hip, sk.kneeR), ln(sk.kneeR, sk.footR), ln(sk.hip, sk.neck), ln(sk.sh, sk.elbL), ln(sk.elbL, sk.handL)].join(' ') });
       set(e.armF, { d: `${ln(sk.sh, sk.elbR)} ${ln(sk.elbR, sk.handR)}` });
 
-      const sx = st.sx ?? 1, sy = st.sy ?? 1, lift = st.lift || 0;
+      const sx = st.sx ?? 1, sy = st.sy ?? 1;
       const op = st.flicker ? 0.55 + Math.random() * 0.45 : 1;
-      set(e.fig, { opacity: op.toFixed(2), transform: `translate(${st.x.toFixed(1)} ${(st.ground - lift).toFixed(1)}) scale(${(K * sx).toFixed(3)} ${(K * sy).toFixed(3)})` });
+      lastXY = [X, st.hangPt ? G + REACH * K : G];
+      set(e.fig, { opacity: op.toFixed(2), transform: `translate(${X.toFixed(1)} ${G.toFixed(1)}) scale(${(K * sx).toFixed(3)} ${(K * sy).toFixed(3)})` });
 
       // ---- viso ----
       const [hx, hy] = sk.headC;
-      const hw = [st.x + hx * K * sx, st.ground - lift + hy * K * sy];
+      const hw = [X + hx * K * sx, G + hy * K * sy];
       const tgt = FACE[st.expr || 'neutral'];
       for (const k in tgt) face[k] = smooth(face[k], tgt[k], dt, 5);
       let lx, ly;
@@ -681,16 +714,20 @@ export default function HomeBuddy() {
 
       // ---- oggetti ----
       const headTop = [hx, hy - LEN.head];
-      chuteK = st.chute != null ? st.chute : smooth(chuteK, 0, dt, 6);
+      chuteK = st.chute != null ? st.chute : (lastDrop > 0.9 ? 0 : smooth(chuteK, 0, dt, 6));
+      lastDrop = st.chuteDrop != null ? st.chuteDrop : st.chute != null ? 0 : lastDrop;
       if (chuteK > 0.01) {
-        const cy = headTop[1] - 30, cx = headTop[0] - Math.sin(rot * D) * 26;
-        const drop = st.chuteDrop ? st.chuteDrop * 14 : 0;
-        set(e.chute, { opacity: Math.min(1, chuteK * 1.5).toFixed(2), transform: `translate(${(cx + drop * f).toFixed(2)} ${(cy + drop).toFixed(2)}) rotate(${(rot * 0.6).toFixed(1)}) scale(${((0.2 + 0.8 * chuteK) * 1.5).toFixed(3)} ${((0.2 + 0.8 * chuteK) * 1.5).toFixed(3)})` });
-        const edgeL = [cx - 30 * chuteK + drop * f, cy + 6 + drop], edgeR = [cx + 30 * chuteK + drop * f, cy + 6 + drop];
-        set(e.strings, { d: `${ln(edgeL, sk.handL)} ${ln(edgeR, sk.handR)} ${ln(edgeL, sk.handR)} ${ln(edgeR, sk.handL)}`, opacity: Math.min(1, chuteK * 1.5).toFixed(2) });
+        // la vela si gonfia con un piccolo rimbalzo e, all'atterraggio, si affloscia di lato
+        const d = clamp(st.chuteDrop || 0, 0, 1);
+        const cy = headTop[1] - 30 + d * 34, cx = headTop[0] - Math.sin(rot * D) * 26 + f * d * 26;
+        const scx = 1.5 * (0.12 + 0.88 * backOut(chuteK)) * (1 - 0.15 * d), scy = 1.5 * (0.08 + 0.92 * easeOut(chuteK)) * (1 - 0.78 * d);
+        const cop = Math.min(1, chuteK * 3) * Math.pow(1 - d, 0.6);
+        set(e.chute, { opacity: cop.toFixed(2), transform: `translate(${cx.toFixed(2)} ${cy.toFixed(2)}) rotate(${(rot * 0.6 + f * d * 55).toFixed(1)}) scale(${scx.toFixed(3)} ${scy.toFixed(3)})` });
+        const edgeL = [cx - 20 * scx, cy + 4 * scy], edgeR = [cx + 20 * scx, cy + 4 * scy];
+        set(e.strings, { d: `${ln(edgeL, sk.handL)} ${ln(edgeR, sk.handR)} ${ln(edgeL, sk.handR)} ${ln(edgeR, sk.handL)}`, opacity: (Math.min(1, chuteK * 3) * Math.max(0, 1 - d * 2.5)).toFixed(2) });
       } else { set(e.chute, { opacity: 0 }); set(e.strings, { opacity: 0 }); }
       umbK = st.umbrella != null ? st.umbrella : smooth(umbK, 0, dt, 6);
-      if (umbK > 0.01) set(e.umb, { opacity: umbK.toFixed(2), transform: `translate(${sk.handR[0].toFixed(2)} ${sk.handR[1].toFixed(2)}) rotate(${(rot * 0.8).toFixed(1)}) scale(${((0.3 + 0.7 * umbK) * 1.3).toFixed(3)})` });
+      if (umbK > 0.01) set(e.umb, { opacity: Math.min(1, umbK * 3).toFixed(2), transform: `translate(${sk.handR[0].toFixed(2)} ${sk.handR[1].toFixed(2)}) rotate(${(rot * 0.8).toFixed(1)}) scale(${(1.3 * (0.14 + 0.86 * Math.pow(clamp(umbK, 0, 1.2), 0.7))).toFixed(3)} ${(1.3 * (0.6 + 0.4 * clamp(umbK, 0, 1))).toFixed(3)})` });
       else set(e.umb, { opacity: 0 });
       if (st.trolley) set(e.trolley, { opacity: 1, transform: `translate(${((sk.handL[0] + sk.handR[0]) / 2).toFixed(2)} ${(Math.min(sk.handL[1], sk.handR[1]) - 1).toFixed(2)})` });
       else set(e.trolley, { opacity: 0 });
