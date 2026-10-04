@@ -5,7 +5,7 @@ import AboutSection from '../components/home/AboutSection';
 import WhatWeDoSection from '../components/home/WhatWeDoSection';
 import ProgramsSection from '../components/home/ProgramsSection';
 import PartnersSection from '../components/home/PartnersSection';
-// import HomeBuddy from '../components/home/HomeBuddy'; // omino della home: disattivato per ora
+import HomeBuddy from '../components/home/HomeBuddy';
 
 const HERO_IMG = '/images/home-sfondo.jpg';
 const ABOUT_IMG = '/images/chi-siamo.jpg';
@@ -19,7 +19,7 @@ export default function Home() {
       <WhatWeDoSection lang={lang} />
       <ProgramsSection lang={lang} />
       <PartnersSection lang={lang} />
-      {/* <HomeBuddy /> */}
+      <HomeBuddy />
     </>
   );
 }
